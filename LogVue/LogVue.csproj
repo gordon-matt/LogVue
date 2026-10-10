@@ -5,6 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Description>An in-process Blazor dashboard for viewing, querying and deleting your ASP.NET Core application's Serilog events.</Description>
+		<Version>1.0.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

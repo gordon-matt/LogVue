@@ -5,6 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Description>Query engine, services and Serilog sink for the LogVue log dashboard.</Description>
+		<Version>1.0.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
