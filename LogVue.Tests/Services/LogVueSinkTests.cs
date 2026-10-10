@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using LogVue.Data;
-using LogVue.Data.Entities;
 using LogVue.Services;
 using LogVue.Services.Hosting;
 using LogVue.Services.Logging;

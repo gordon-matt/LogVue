@@ -49,7 +49,7 @@ public sealed class SampleTrafficGenerator(ILogger<SampleTrafficGenerator> logge
             case < 70:
                 logger.LogInformation(
                     "Order {OrderId} placed by {Customer} for {Quantity} x {Product} totalling {Total:C}",
-                    orderId, customer, random.Next(1, 6), product, Math.Round(random.NextDouble() * 900 + 20, 2));
+                    orderId, customer, random.Next(1, 6), product, Math.Round((random.NextDouble() * 900) + 20, 2));
                 break;
 
             case < 82:

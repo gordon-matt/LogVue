@@ -134,12 +134,9 @@ public sealed class LogEntryService(
         var deleted = await RunAsync("delete an entry", async () =>
             Result<int>.Success(await entryRepository.DeleteAsync(e => e.Id == id, DeleteOptions(cancellationToken))));
 
-        if (!deleted.IsSuccess)
-        {
-            return deleted.ToVoid();
-        }
-
-        return deleted.Value == 0
+        return !deleted.IsSuccess
+            ? deleted.ToVoid()
+            : deleted.Value == 0
             ? Result.NotFound($"Entry {id} was not found. It may already have been deleted.")
             : Result.Success();
     }
@@ -153,12 +150,9 @@ public sealed class LogEntryService(
 
         var built = BuildPredicate(filter, includeLevels: true);
 
-        if (!built.IsSuccess)
-        {
-            return built.To<int>();
-        }
-
-        return await RunAsync("delete matching entries", async () =>
+        return !built.IsSuccess
+            ? built.To<int>()
+            : await RunAsync("delete matching entries", async () =>
         {
             int deleted = await entryRepository.DeleteAsync(built.Value, DeleteOptions(cancellationToken));
 

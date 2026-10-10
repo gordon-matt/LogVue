@@ -23,15 +23,9 @@ public sealed class TimeDisplay
     public string Label => IsUtc ? "UTC" : Zone.Id;
 
     /// <summary>Falls back to UTC when the browser reports a zone this server doesn't know.</summary>
-    public static TimeDisplay ForBrowser(string? timeZoneId)
-    {
-        if (!string.IsNullOrWhiteSpace(timeZoneId) && TimeZoneInfo.TryFindSystemTimeZoneById(timeZoneId, out var zone))
-        {
-            return new TimeDisplay(zone, isUtc: false);
-        }
-
-        return Utc;
-    }
+    public static TimeDisplay ForBrowser(string? timeZoneId) => !string.IsNullOrWhiteSpace(timeZoneId) && TimeZoneInfo.TryFindSystemTimeZoneById(timeZoneId, out var zone)
+            ? new TimeDisplay(zone, isUtc: false)
+            : Utc;
 
     public DateTime ToDisplay(DateTime utc) =>
         TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utc, DateTimeKind.Utc), Zone);

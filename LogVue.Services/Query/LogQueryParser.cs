@@ -26,15 +26,12 @@ internal static partial class LogQueryParser
                 : new TextSearchNode([phrase]);
         }
 
-        if (!ExpressionHint().IsMatch(trimmed))
-        {
-            return new TextSearchNode([.. trimmed
+        return !ExpressionHint().IsMatch(trimmed)
+            ? new TextSearchNode([.. trimmed
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Take(MaxSearchTerms)]);
-        }
-
-        return new Parser(new Scanner(trimmed).Scan()).Parse();
+                .Take(MaxSearchTerms)])
+            : new Parser(new Scanner(trimmed).Scan()).Parse();
     }
 
     /// <summary>Whether <paramref name="query"/> would be parsed as an expression rather than searched as text.</summary>

@@ -22,7 +22,7 @@ public static class ResultExtensions
                 $"Result<{typeof(TTo).Name}> without a projection.");
         }
 
-        var errors = result.Errors?.ToArray() ?? [];
+        string[] errors = result.Errors?.ToArray() ?? [];
 
         return result.Status switch
         {
@@ -45,7 +45,7 @@ public static class ResultExtensions
             return Result.Success();
         }
 
-        var errors = result.Errors?.ToArray() ?? [];
+        string[] errors = result.Errors?.ToArray() ?? [];
 
         return result.Status switch
         {
@@ -73,19 +73,16 @@ public static class ResultExtensions
         }
 
         var validation = result.ValidationErrors?.FirstOrDefault();
-        if (validation is not null && !string.IsNullOrWhiteSpace(validation.ErrorMessage))
-        {
-            return validation.ErrorMessage;
-        }
-
-        return result.Status switch
-        {
-            ResultStatus.NotFound => "That entry no longer exists.",
-            ResultStatus.Forbidden => "The dashboard is read-only.",
-            ResultStatus.Conflict => "That conflicts with something that already exists.",
-            ResultStatus.Invalid => "Some of the values supplied were not valid.",
-            ResultStatus.Unavailable => "The log store is temporarily unavailable.",
-            _ => "Something went wrong. Please try again.",
-        };
+        return validation is not null && !string.IsNullOrWhiteSpace(validation.ErrorMessage)
+            ? validation.ErrorMessage
+            : result.Status switch
+            {
+                ResultStatus.NotFound => "That entry no longer exists.",
+                ResultStatus.Forbidden => "The dashboard is read-only.",
+                ResultStatus.Conflict => "That conflicts with something that already exists.",
+                ResultStatus.Invalid => "Some of the values supplied were not valid.",
+                ResultStatus.Unavailable => "The log store is temporarily unavailable.",
+                _ => "Something went wrong. Please try again.",
+            };
     }
 }

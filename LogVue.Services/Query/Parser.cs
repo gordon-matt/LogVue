@@ -26,12 +26,7 @@ internal sealed class Parser(List<Token> tokens)
 
         var node = Or();
 
-        if (!IsAtEnd)
-        {
-            throw new LogQueryException(Error(Peek(), "expected \"and\", \"or\" or the end of the query."));
-        }
-
-        return node;
+        return !IsAtEnd ? throw new LogQueryException(Error(Peek(), "expected \"and\", \"or\" or the end of the query.")) : node;
     }
 
     private QueryNode Or()
@@ -98,12 +93,9 @@ internal sealed class Parser(List<Token> tokens)
             _ => throw new LogQueryException(Error(literal, "expected a value, such as 'text', 42 or true.")),
         };
 
-        if (comparison is ComparisonOperator.Like or ComparisonOperator.NotLike && literal.Type != TokenType.String)
-        {
-            throw new LogQueryException(Error(literal, "like needs a quoted pattern, such as '%timeout%'."));
-        }
-
-        return new ComparisonNode(field.Text, comparison, value, field.Position);
+        return comparison is ComparisonOperator.Like or ComparisonOperator.NotLike && literal.Type != TokenType.String
+            ? throw new LogQueryException(Error(literal, "like needs a quoted pattern, such as '%timeout%'."))
+            : (QueryNode)new ComparisonNode(field.Text, comparison, value, field.Position);
     }
 
     private bool Match(TokenType type)

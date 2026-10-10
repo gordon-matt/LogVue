@@ -124,17 +124,13 @@ public sealed class LogVueSink(
     {
         var settings = options.Value;
 
-        if (!settings.IgnoreDashboardRequests)
+        return settings.IgnoreDashboardRequests && (IsUnderBasePath("RequestPath") || IsUnderBasePath("Path"));
+        bool IsUnderBasePath(string propertyName)
         {
-            return false;
-        }
-
-        return IsUnderBasePath("RequestPath") || IsUnderBasePath("Path");
-
-        bool IsUnderBasePath(string propertyName) =>
-            logEvent.Properties.TryGetValue(propertyName, out var value)
+            return logEvent.Properties.TryGetValue(propertyName, out var value)
             && value is ScalarValue { Value: string path }
             && path.StartsWith(settings.BasePath, StringComparison.OrdinalIgnoreCase)
             && (path.Length == settings.BasePath.Length || path[settings.BasePath.Length] == '/');
+        }
     }
 }

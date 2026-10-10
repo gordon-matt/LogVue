@@ -65,25 +65,16 @@ internal sealed class LogQueryCompiler(ILogVueQueryDialect dialect)
         return predicate;
     }
 
-    private static Expression<Func<LogEntry, bool>> CompileLevel(ComparisonNode node)
-    {
-        if (node.Operator is ComparisonOperator.Like or ComparisonOperator.NotLike)
-        {
-            throw new LogQueryException(
-                $"At position {node.Position + 1}: level can only be compared with = or !=.");
-        }
-
-        if (!LogLevels.TryParse(node.Value, out var level))
-        {
-            throw new LogQueryException(
+    private static Expression<Func<LogEntry, bool>> CompileLevel(ComparisonNode node) => node.Operator is ComparisonOperator.Like or ComparisonOperator.NotLike
+            ? throw new LogQueryException(
+                $"At position {node.Position + 1}: level can only be compared with = or !=.")
+            : !LogLevels.TryParse(node.Value, out var level)
+            ? throw new LogQueryException(
                 $"At position {node.Position + 1}: '{node.Value}' is not a level. " +
-                "Use Verbose, Debug, Information, Warning, Error or Fatal.");
-        }
-
-        return node.Operator == ComparisonOperator.Equal
+                "Use Verbose, Debug, Information, Warning, Error or Fatal.")
+            : node.Operator == ComparisonOperator.Equal
             ? e => e.Level == level
             : e => e.Level != level;
-    }
 
     /// <summary>
     /// <c>Name = 'x'</c> means "has a property Name equal to x", and <c>Name != 'x'</c> means

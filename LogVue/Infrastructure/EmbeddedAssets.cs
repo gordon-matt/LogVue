@@ -32,12 +32,9 @@ internal static class EmbeddedAssets
             : new CacheControlHeaderValue { NoCache = true };
 
         var requestETags = context.Request.GetTypedHeaders().IfNoneMatch;
-        if (requestETags.Any(tag => tag.Compare(asset.ETag, useStrongComparison: false)))
-        {
-            return Results.StatusCode(StatusCodes.Status304NotModified);
-        }
-
-        return Results.Bytes(asset.Content, asset.ContentType);
+        return requestETags.Any(tag => tag.Compare(asset.ETag, useStrongComparison: false))
+            ? Results.StatusCode(StatusCodes.Status304NotModified)
+            : Results.Bytes(asset.Content, asset.ContentType);
     }
 
     private static Asset? Get(string name) => Cache.GetOrAdd(name, Load);

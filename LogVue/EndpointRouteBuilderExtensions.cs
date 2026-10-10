@@ -46,16 +46,13 @@ public static class EndpointRouteBuilderExtensions
     {
         var file = environment.WebRootFileProvider.GetFileInfo("_framework/blazor.web.js");
 
-        if (!file.Exists)
-        {
-            return Results.Problem(
+        return !file.Exists
+            ? Results.Problem(
                 "blazor.web.js was not found in the web root. LogVue needs the host to be built with " +
                 "the ASP.NET Core Web SDK, and static web assets to be enabled outside Development " +
                 "(they are copied into wwwroot on publish).",
-                statusCode: StatusCodes.Status404NotFound);
-        }
-
-        return file.PhysicalPath is { } physicalPath
+                statusCode: StatusCodes.Status404NotFound)
+            : file.PhysicalPath is { } physicalPath
             ? Results.File(physicalPath, "text/javascript")
             : Results.Stream(file.CreateReadStream(), "text/javascript", lastModified: file.LastModified);
     }

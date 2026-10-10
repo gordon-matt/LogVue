@@ -74,7 +74,10 @@ public sealed record DashboardFilter
     {
         var query = QueryHelpers.ParseQuery(new Uri(uri).Query);
 
-        string? Get(string key) => query.TryGetValue(key, out var values) ? values.ToString() : null;
+        string? Get(string key)
+        {
+            return query.TryGetValue(key, out var values) ? values.ToString() : null;
+        }
 
         var levels = new HashSet<LogEventLevel>();
         foreach (string part in (Get(LevelsKey) ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries))
