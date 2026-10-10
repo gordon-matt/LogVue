@@ -1,0 +1,24 @@
+@implements IDisposable
+@inject ToastService Toasts
+
+<div class="lv-toaster" role="status" aria-live="polite">
+    @foreach (var toast in Toasts.Toasts)
+    {
+        <div class="lv-toast lv-toast-@toast.Level.ToString().ToLowerInvariant()" @key="toast.Id">
+            <Icon Name="@(toast.Level == ToastService.ToastLevel.Error ? "alert" : "check")" />
+            <span class="lv-toast-message">@toast.Message</span>
+            <button type="button" class="lv-icon-button" aria-label="Dismiss" @onclick="() => Toasts.Dismiss(toast.Id)">
+                <Icon Name="x" />
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized() => Toasts.Changed += OnChanged;
+
+    // Toasts expire on a timer thread, outside the renderer's synchronization context.
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Toasts.Changed -= OnChanged;
+}

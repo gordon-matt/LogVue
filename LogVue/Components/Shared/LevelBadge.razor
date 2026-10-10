@@ -1,0 +1,5 @@
+<span class="lv-badge lv-level-@Level.ToString().ToLowerInvariant()" title="@Level">@LogLevels.ShortName(Level)</span>
+
+@code {
+    [Parameter] public LogEventLevel Level { get; set; }
+}

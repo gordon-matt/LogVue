@@ -1,0 +1,58 @@
+<div id="lv-row-@Entry.Id" role="row" aria-selected="@IsSelected"
+     class="lv-row lv-level-@Entry.Level.ToString().ToLowerInvariant() @(IsSelected ? "is-selected" : null) @(IsNew ? "is-new" : null)"
+     @onclick="() => OnSelect.InvokeAsync(Entry)">
+    <span class="lv-cell-time" role="cell" title="@Time.FormatLong(Entry.Timestamp)"><span class="lv-date">@Time.FormatDate(Entry.Timestamp) </span>@Time.FormatTime(Entry.Timestamp)</span>
+    <span class="lv-cell-level" role="cell"><LevelBadge Level="Entry.Level" /></span>
+    <span class="lv-cell-message" role="cell"><MessageView Segments="Entry.Segments" /></span>
+    <span class="lv-cell-meta" role="cell">
+        @if (Entry.Exception is not null)
+        {
+            <span class="lv-exception-flag" title="Has an exception"><Icon Name="bug" /></span>
+        }
+        @if (SourceName is not null)
+        {
+            <span class="lv-source" title="@Entry.SourceContext">@SourceName</span>
+        }
+    </span>
+</div>
+
+@code {
+    private LogEntryDto? renderedEntry;
+    private bool renderedSelected;
+    private bool renderedNew;
+    private TimeDisplay? renderedTime;
+    private bool shouldRender = true;
+
+    [Parameter, EditorRequired] public LogEntryDto Entry { get; set; } = default!;
+
+    [Parameter, EditorRequired] public TimeDisplay Time { get; set; } = TimeDisplay.Utc;
+
+    [Parameter] public bool IsSelected { get; set; }
+
+    [Parameter] public bool IsNew { get; set; }
+
+    [Parameter] public EventCallback<LogEntryDto> OnSelect { get; set; }
+
+    /// <summary>The class name alone; the namespace is in the tooltip and the details panel.</summary>
+    private string? SourceName => Entry.SourceContext is { } source
+        ? source[(source.LastIndexOf('.') + 1)..]
+        : null;
+
+    protected override void OnParametersSet()
+    {
+        // Entries are immutable, so a row only needs to re-render when it is given a different
+        // entry or its selection changes. With thousands of rows loaded, skipping the rest keeps
+        // every live-tail tick and click cheap.
+        shouldRender = !ReferenceEquals(Entry, renderedEntry)
+                       || IsSelected != renderedSelected
+                       || IsNew != renderedNew
+                       || !ReferenceEquals(Time, renderedTime);
+
+        renderedEntry = Entry;
+        renderedSelected = IsSelected;
+        renderedNew = IsNew;
+        renderedTime = Time;
+    }
+
+    protected override bool ShouldRender() => shouldRender;
+}

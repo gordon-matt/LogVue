@@ -1,0 +1,15 @@
+@foreach (var segment in Segments)
+{
+    if (segment.Kind == MessageSegmentKind.Text)
+    {
+        @segment.Text
+    }
+    else
+    {
+        <span class="lv-tok lv-tok-@segment.Kind.ToString().ToLowerInvariant()" title="@segment.PropertyName">@segment.Text</span>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<MessageSegment> Segments { get; set; } = [];
+}

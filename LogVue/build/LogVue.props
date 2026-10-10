@@ -1,0 +1,11 @@
+<Project>
+
+	<!--
+	  The Web SDK only adds the framework's blazor.web.js to a host's static web assets when the host
+	  has .razor files of its own. LogVue's dashboard needs it in any host, Blazor or not.
+	-->
+	<PropertyGroup>
+		<RequiresAspNetWebAssets Condition="'$(RequiresAspNetWebAssets)' == ''">true</RequiresAspNetWebAssets>
+	</PropertyGroup>
+
+</Project>

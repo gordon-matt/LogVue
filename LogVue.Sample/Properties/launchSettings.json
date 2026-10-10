@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "LogVue.Sample": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "logvue",
+      "applicationUrl": "http://localhost:5180",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

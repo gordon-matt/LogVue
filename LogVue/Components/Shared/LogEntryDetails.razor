@@ -1,0 +1,163 @@
+@using System.Text.Json
+@inject IJSRuntime JS
+@inject ToastService Toasts
+@inject TimeProvider TimeProvider
+
+<aside class="lv-details" aria-label="Entry details">
+    <header class="lv-details-head">
+        <LevelBadge Level="Entry.Level" />
+        <div class="lv-details-when">
+            <span class="lv-mono">@Time.Format(Entry.Timestamp)</span>
+            <span class="lv-muted lv-small">@TimeDisplay.Relative(Entry.Timestamp, TimeProvider.GetUtcNow().UtcDateTime)</span>
+        </div>
+        <div class="lv-details-actions">
+            <button type="button" class="lv-icon-button" title="Copy as JSON" @onclick="CopyJsonAsync">
+                <Icon Name="copy" />
+            </button>
+            @if (!ReadOnly)
+            {
+                <button type="button" class="lv-icon-button lv-danger-hover" title="Delete this entry"
+                        @onclick="() => OnDelete.InvokeAsync(Entry)">
+                    <Icon Name="trash" />
+                </button>
+            }
+            <button type="button" class="lv-icon-button" title="Close (Esc)" @onclick="OnClose">
+                <Icon Name="x" />
+            </button>
+        </div>
+    </header>
+
+    <div class="lv-details-body">
+        <section>
+            <h4>Message</h4>
+            <div class="lv-message-full"><MessageView Segments="Entry.Segments" /></div>
+        </section>
+
+        @if (Entry.Exception is not null)
+        {
+            <section>
+                <h4>
+                    Exception
+                    <button type="button" class="lv-link-button" @onclick="CopyExceptionAsync">
+                        <Icon Name="copy" /> Copy
+                    </button>
+                </h4>
+                <div class="lv-exception">
+                    @foreach (string line in Entry.Exception.Split('\n'))
+                    {
+                        string trimmed = line.TrimEnd('\r');
+                        <div class="@ExceptionLineClass(trimmed)">@trimmed</div>
+                    }
+                </div>
+            </section>
+        }
+
+        <section>
+            <h4>Properties <span class="lv-muted">@Entry.Properties.Count</span></h4>
+            @if (Entry.Properties.Count == 0)
+            {
+                <p class="lv-muted lv-small">This event has no properties.</p>
+            }
+            else
+            {
+                <table class="lv-props">
+                    <tbody>
+                        @foreach (var property in Entry.Properties)
+                        {
+                            <tr @key="property.Name">
+                                <th scope="row" title="@property.Name">@property.Name</th>
+                                <td class="lv-mono">@property.Value</td>
+                                <td class="lv-props-actions">
+                                    <button type="button" class="lv-icon-button" title="Only entries where @property.Name is this value"
+                                            @onclick="() => OnFilter.InvokeAsync(LogQueryText.Condition(property.Name, property.Value))">
+                                        <Icon Name="equal" />
+                                    </button>
+                                    <button type="button" class="lv-icon-button" title="Exclude entries where @property.Name is this value"
+                                            @onclick="() => OnFilter.InvokeAsync(LogQueryText.Condition(property.Name, property.Value, exclude: true))">
+                                        <Icon Name="not-equal" />
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </section>
+
+        <section>
+            <h4>
+                Template
+                <button type="button" class="lv-link-button" title="Only entries from this template"
+                        @onclick="FilterByTemplateAsync">
+                    <Icon Name="equal" /> Filter
+                </button>
+            </h4>
+            <code class="lv-template">@Entry.MessageTemplate</code>
+        </section>
+
+        <p class="lv-muted lv-small lv-details-foot">
+            #@Entry.Id.ToString(CultureInfo.InvariantCulture) · @Time.FormatLong(Entry.Timestamp)
+        </p>
+    </div>
+</aside>
+
+@code {
+    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+
+    [Parameter, EditorRequired] public LogEntryDto Entry { get; set; } = default!;
+
+    [Parameter, EditorRequired] public TimeDisplay Time { get; set; } = TimeDisplay.Utc;
+
+    [Parameter] public bool ReadOnly { get; set; }
+
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    [Parameter] public EventCallback<LogEntryDto> OnDelete { get; set; }
+
+    /// <summary>Raised with a condition to AND onto the current query.</summary>
+    [Parameter] public EventCallback<string> OnFilter { get; set; }
+
+    private static string? ExceptionLineClass(string line)
+    {
+        string trimmed = line.TrimStart();
+
+        return trimmed.StartsWith("at ", StringComparison.Ordinal)
+            ? "lv-frame"
+            : trimmed.StartsWith("---", StringComparison.Ordinal)
+                ? "lv-frame-separator"
+                : "lv-frame-message";
+    }
+
+    private Task CopyExceptionAsync() => CopyAsync(Entry.Exception ?? string.Empty, "Exception copied.");
+
+    private Task FilterByTemplateAsync() =>
+        OnFilter.InvokeAsync(LogQueryText.Condition("messageTemplate", Entry.MessageTemplate));
+
+    private Task CopyJsonAsync()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            Entry.Id,
+            Timestamp = Entry.Timestamp.ToString("O", CultureInfo.InvariantCulture),
+            Level = Entry.Level.ToString(),
+            Entry.Message,
+            Entry.MessageTemplate,
+            Entry.Exception,
+            Properties = Entry.Properties.ToDictionary(p => p.Name, p => p.Value),
+        }, JsonOptions);
+
+        return CopyAsync(json, "Entry copied as JSON.");
+    }
+
+    private async Task CopyAsync(string text, string confirmation)
+    {
+        if (await JS.InvokeAsync<bool>("logVue.copy", text))
+        {
+            Toasts.Success(confirmation);
+        }
+        else
+        {
+            Toasts.Error("The browser did not allow copying to the clipboard.");
+        }
+    }
+}

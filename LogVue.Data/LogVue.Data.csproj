@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Provider-agnostic data model for the LogVue log dashboard.</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Extenso.Data.Entity" Version="10.1.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.7" />
+		<PackageReference Include="Serilog" Version="4.3.1" />
+	</ItemGroup>
+
+</Project>

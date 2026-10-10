@@ -1,0 +1,76 @@
+<div class="lv-search-wrap">
+    <form class="lv-search @(Error is null ? null : "lv-search-invalid")" @onsubmit="Submit" role="search" title="@Error">
+        <Icon Name="search" Class="lv-search-icon" />
+        <input id="lv-search" class="lv-search-input" type="text" spellcheck="false" autocomplete="off"
+               placeholder="Search, or filter: StatusCode = 500 and SourceContext like '%Orders%'"
+               aria-label="Search or filter the log"
+               @bind="text" @bind:event="oninput" />
+        @if (!string.IsNullOrEmpty(text))
+        {
+            <button type="button" class="lv-icon-button" title="Clear" @onclick="Clear">
+                <Icon Name="x" />
+            </button>
+        }
+        @if (CanSave && !string.IsNullOrWhiteSpace(Query))
+        {
+            <button type="button" class="lv-icon-button" title="Save this query" @onclick="OnSave">
+                <Icon Name="bookmark" />
+            </button>
+        }
+        <button type="button" class="lv-icon-button @(showHelp ? "is-active" : null)" title="Query syntax"
+                aria-expanded="@showHelp" @onclick="() => showHelp = !showHelp">
+            <Icon Name="help" />
+        </button>
+        <kbd class="lv-kbd" title="Press / to search">/</kbd>
+    </form>
+
+    @if (showHelp)
+    {
+        <div class="lv-popover-backdrop" @onclick="() => showHelp = false"></div>
+        <QueryHelp OnPick="Pick" />
+    }
+</div>
+
+@code {
+    private string? text;
+    private string? appliedQuery;
+    private bool showHelp;
+
+    /// <summary>The query currently applied to the view.</summary>
+    [Parameter] public string? Query { get; set; }
+
+    /// <summary>Why <see cref="Query"/> didn't parse, if it didn't. The dashboard shows it in full in place of the results.</summary>
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public bool CanSave { get; set; }
+
+    [Parameter] public EventCallback<string?> OnSearch { get; set; }
+
+    [Parameter] public EventCallback OnSave { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        // Only follow the applied query when it changes from outside (back button, a saved query,
+        // a property click), so a parent re-render never discards what is being typed.
+        if (Query != appliedQuery)
+        {
+            appliedQuery = Query;
+            text = Query;
+        }
+    }
+
+    private Task Submit() => OnSearch.InvokeAsync(string.IsNullOrWhiteSpace(text) ? null : text.Trim());
+
+    private Task Clear()
+    {
+        text = null;
+        return OnSearch.InvokeAsync(null);
+    }
+
+    private Task Pick(string example)
+    {
+        showHelp = false;
+        text = example;
+        return Submit();
+    }
+}

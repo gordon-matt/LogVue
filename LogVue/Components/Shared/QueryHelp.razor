@@ -1,0 +1,51 @@
+<div class="lv-popover lv-query-help" role="dialog" aria-label="Query syntax">
+    <section>
+        <h4>Search</h4>
+        <p>
+            Words are matched anywhere in the message, exception or property values; every word must match.
+            Wrap a phrase in double quotes to match it exactly.
+        </p>
+    </section>
+
+    <section>
+        <h4>Filter</h4>
+        <p>
+            Compare a property with <code>=</code>, <code>!=</code>, <code>like</code> or <code>not like</code>,
+            and combine comparisons with <code>and</code>, <code>or</code> and parentheses.
+            In <code>like</code>, <code>%</code> matches anything and <code>_</code> one character.
+            Matching ignores case.
+        </p>
+        <p>
+            Besides property names you can use <code>message</code>, <code>messageTemplate</code>,
+            <code>exception</code> and <code>level</code>.
+        </p>
+    </section>
+
+    <section>
+        <h4>Examples</h4>
+        <ul class="lv-examples">
+            @foreach (var example in Examples)
+            {
+                <li>
+                    <button type="button" @onclick="() => OnPick.InvokeAsync(example)"><code>@example</code></button>
+                </li>
+            }
+        </ul>
+    </section>
+</div>
+
+@code {
+    private static readonly string[] Examples =
+    [
+        "timeout",
+        "\"connection refused\"",
+        "StatusCode = 500",
+        "SourceContext like '%Orders%'",
+        "level = warning or level = error",
+        "RequestPath like '/api/%' and StatusCode != 200",
+        "exception like '%SqlException%'",
+        "message not like '%health%'",
+    ];
+
+    [Parameter] public EventCallback<string> OnPick { get; set; }
+}

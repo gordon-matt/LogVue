@@ -1,0 +1,198 @@
+@inject ILogEntryService LogEntries
+@inject TimeProvider TimeProvider
+
+@if (isVisible)
+{
+    <div class="lv-modal-backdrop" @onclick="Cancel"></div>
+    <div class="lv-modal lv-modal-wide" role="dialog" aria-modal="true" aria-labelledby="lv-cleanup-title">
+        <h2 class="lv-modal-title" id="lv-cleanup-title">Delete log entries</h2>
+        <p class="lv-muted lv-small">Entries are deleted from the database permanently.</p>
+
+        <div class="lv-choices" role="radiogroup">
+            <label class="lv-choice @(mode == CleanupMode.Matching ? "is-selected" : null) @(hasCriteria ? null : "is-disabled")">
+                <input type="radio" name="lv-cleanup" checked="@(mode == CleanupMode.Matching)" disabled="@(!hasCriteria || isDeleting)"
+                       @onchange="() => SetModeAsync(CleanupMode.Matching)" />
+                <span>
+                    <strong>Entries matching the current view</strong>
+                    <span class="lv-muted lv-small">@(hasCriteria ? viewDescription : "Set a filter first; with none, this is everything.")</span>
+                </span>
+            </label>
+
+            <label class="lv-choice @(mode == CleanupMode.OlderThan ? "is-selected" : null)">
+                <input type="radio" name="lv-cleanup" checked="@(mode == CleanupMode.OlderThan)" disabled="@isDeleting"
+                       @onchange="() => SetModeAsync(CleanupMode.OlderThan)" />
+                <span>
+                    <strong>
+                        Entries older than
+                        <input class="lv-input lv-input-inline" type="number" min="1" max="36500" disabled="@isDeleting"
+                               @bind="days" @bind:after="DaysChangedAsync" @onclick:stopPropagation="true" />
+                        days
+                    </strong>
+                    <span class="lv-muted lv-small">Before @CutoffUtc.ToString("u", CultureInfo.InvariantCulture)</span>
+                </span>
+            </label>
+
+            <label class="lv-choice lv-choice-danger @(mode == CleanupMode.Everything ? "is-selected" : null)">
+                <input type="radio" name="lv-cleanup" checked="@(mode == CleanupMode.Everything)" disabled="@isDeleting"
+                       @onchange="() => SetModeAsync(CleanupMode.Everything)" />
+                <span>
+                    <strong>Everything</strong>
+                    <span class="lv-muted lv-small">Empties the log store.</span>
+                </span>
+            </label>
+        </div>
+
+        <p class="lv-cleanup-count" aria-live="polite">
+            @if (isDeleting)
+            {
+                <span class="lv-spinner lv-spinner-small"></span>
+                <span>Deleting… on a large store this can take a while.</span>
+            }
+            else if (count is null)
+            {
+                <span class="lv-spinner lv-spinner-small"></span>
+                <span>Counting…</span>
+            }
+            else if (countError is not null)
+            {
+                <span class="lv-text-danger">@countError</span>
+            }
+            else
+            {
+                <span><strong>@count.Value.ToString("N0", CultureInfo.CurrentCulture)</strong> @(count == 1 ? "entry" : "entries") will be deleted.</span>
+            }
+        </p>
+
+        <div class="lv-modal-actions">
+            <button type="button" class="lv-button" disabled="@isDeleting" @onclick="Cancel">Cancel</button>
+            <button type="button" class="lv-button lv-button-danger" disabled="@(isDeleting || count is null or 0)" @onclick="DeleteAsync">
+                <Icon Name="trash" /> Delete @(count is long n ? n.ToString("N0", CultureInfo.CurrentCulture) : null)
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    private enum CleanupMode
+    {
+        Matching,
+        OlderThan,
+        Everything,
+    }
+
+    private bool isVisible;
+    private bool isDeleting;
+    private bool hasCriteria;
+    private string? viewDescription;
+    private LogFilter viewFilter = new();
+    private CleanupMode mode;
+    private int days = 30;
+    private long? count;
+    private string? countError;
+    private int countVersion;
+    private TaskCompletionSource<int?>? completion;
+
+    private DateTime CutoffUtc => TimeProvider.GetUtcNow().UtcDateTime.AddDays(-Math.Max(1, days));
+
+    /// <summary>
+    /// Shows the dialog and completes with the number of entries deleted, or null when cancelled.
+    /// </summary>
+    public Task<int?> ShowAsync(LogFilter currentView, bool hasCriteria, string viewDescription)
+    {
+        viewFilter = currentView;
+        this.hasCriteria = hasCriteria;
+        this.viewDescription = viewDescription;
+        mode = hasCriteria ? CleanupMode.Matching : CleanupMode.OlderThan;
+        isDeleting = false;
+        isVisible = true;
+        completion = new TaskCompletionSource<int?>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        _ = CountAsync();
+
+        return completion.Task;
+    }
+
+    private Task SetModeAsync(CleanupMode next)
+    {
+        mode = next;
+        return CountAsync();
+    }
+
+    private Task DaysChangedAsync()
+    {
+        days = Math.Clamp(days, 1, 36500);
+        mode = CleanupMode.OlderThan;
+        return CountAsync();
+    }
+
+    private LogFilter FilterForMode() => mode switch
+    {
+        CleanupMode.Matching => viewFilter,
+        CleanupMode.OlderThan => new LogFilter { ToUtc = CutoffUtc },
+        _ => new LogFilter(),
+    };
+
+    private async Task CountAsync()
+    {
+        // Changing the choice while a count is running must not let the stale count win.
+        int version = ++countVersion;
+        count = null;
+        countError = null;
+        StateHasChanged();
+
+        var result = await LogEntries.CountMatchingAsync(FilterForMode());
+
+        if (version != countVersion)
+        {
+            return;
+        }
+
+        if (result.IsSuccess)
+        {
+            count = result.Value;
+        }
+        else
+        {
+            count = 0;
+            countError = result.GetDisplayMessage();
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task DeleteAsync()
+    {
+        isDeleting = true;
+        StateHasChanged();
+
+        var result = mode == CleanupMode.OlderThan
+            ? await LogEntries.DeleteOlderThanAsync(CutoffUtc)
+            : await LogEntries.DeleteMatchingAsync(FilterForMode());
+
+        isDeleting = false;
+
+        if (!result.IsSuccess)
+        {
+            countError = result.GetDisplayMessage();
+            StateHasChanged();
+            return;
+        }
+
+        isVisible = false;
+        completion?.TrySetResult(result.Value);
+        completion = null;
+    }
+
+    private void Cancel()
+    {
+        if (isDeleting)
+        {
+            return;
+        }
+
+        isVisible = false;
+        countVersion++;
+        completion?.TrySetResult(null);
+        completion = null;
+    }
+}

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>An in-process Blazor dashboard for viewing, querying and deleting your ASP.NET Core application's Serilog events.</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!--
+		  Served by LogVue's own endpoint rather than as static web assets, so the dashboard works
+		  whether or not the host calls UseStaticFiles or MapStaticAssets.
+		-->
+		<EmbeddedResource Include="Assets\*" LogicalName="LogVue.Assets.%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="build\LogVue.props" Pack="true" PackagePath="build;buildTransitive" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LogVue.Services\LogVue.Services.csproj" />
+	</ItemGroup>
+
+</Project>

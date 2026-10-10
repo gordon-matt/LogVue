@@ -1,0 +1,107 @@
+<div class="lv-dropdown">
+    <button type="button" class="lv-button lv-range-button @(Filter.Range == TimeRange.All ? null : "is-active")"
+            aria-haspopup="true" aria-expanded="@isOpen" @onclick="Toggle">
+        <Icon Name="clock" />
+        <span>@Label</span>
+        <Icon Name="chevron-down" Class="lv-chevron" />
+    </button>
+
+    @if (isOpen)
+    {
+        <div class="lv-popover-backdrop" @onclick="() => isOpen = false"></div>
+        <div class="lv-popover lv-range-menu" role="menu">
+            @foreach (var preset in TimeRange.Presets)
+            {
+                <button type="button" role="menuitemradio" aria-checked="@(Filter.Range == preset)"
+                        class="lv-menu-item @(Filter.Range == preset ? "is-selected" : null)"
+                        @onclick="() => SelectAsync(preset)">
+                    <span>@preset.Label</span>
+                    @if (Filter.Range == preset)
+                    {
+                        <Icon Name="check" />
+                    }
+                </button>
+            }
+
+            <form class="lv-range-custom" @onsubmit="ApplyCustomAsync">
+                <div class="lv-menu-heading">Custom range <span class="lv-muted">(@Time.Label)</span></div>
+                <label class="lv-field">
+                    <span>From</span>
+                    <input class="lv-input" type="datetime-local" step="1" @bind="customFrom" />
+                </label>
+                <label class="lv-field">
+                    <span>To</span>
+                    <input class="lv-input" type="datetime-local" step="1" @bind="customTo" />
+                </label>
+                <button type="submit" class="lv-button lv-button-primary" disabled="@(customFrom is null && customTo is null)">
+                    Apply
+                </button>
+            </form>
+        </div>
+    }
+</div>
+
+@code {
+    private bool isOpen;
+    private DateTime? customFrom;
+    private DateTime? customTo;
+
+    [Parameter, EditorRequired] public DashboardFilter Filter { get; set; } = new();
+
+    [Parameter, EditorRequired] public TimeDisplay Time { get; set; } = TimeDisplay.Utc;
+
+    [Parameter] public EventCallback<DashboardFilter> OnChange { get; set; }
+
+    private string Label => Filter.Range != TimeRange.Custom
+        ? Filter.Range.Label
+        : (Filter.FromUtc, Filter.ToUtc) switch
+        {
+            (DateTime from, DateTime to) => $"{Short(from)} – {Short(to)}",
+            (DateTime from, null) => $"Since {Short(from)}",
+            (null, DateTime to) => $"Before {Short(to)}",
+            _ => TimeRange.All.Label,
+        };
+
+    private string Short(DateTime utc) => Time.ToDisplay(utc).ToString("MMM d HH:mm", CultureInfo.InvariantCulture);
+
+    private void Toggle()
+    {
+        isOpen = !isOpen;
+
+        if (isOpen)
+        {
+            // Start a custom range from what is on screen now, so narrowing it is a small edit.
+            var now = DateTime.UtcNow;
+            var current = Filter.ToLogFilter(now);
+            customFrom = Trim(current.FromUtc ?? now.AddHours(-1));
+            customTo = current.ToUtc is DateTime to ? Trim(to) : null;
+        }
+    }
+
+    private DateTime Trim(DateTime utc)
+    {
+        var local = Time.ToDisplay(utc);
+        return new DateTime(local.Year, local.Month, local.Day, local.Hour, local.Minute, local.Second);
+    }
+
+    private Task SelectAsync(TimeRange range)
+    {
+        isOpen = false;
+        return OnChange.InvokeAsync(Filter with { Range = range, FromUtc = null, ToUtc = null });
+    }
+
+    private Task ApplyCustomAsync()
+    {
+        isOpen = false;
+
+        DateTime? from = customFrom is DateTime f ? Time.ToUtc(f) : null;
+        DateTime? to = customTo is DateTime t ? Time.ToUtc(t) : null;
+
+        if (from > to)
+        {
+            (from, to) = (to, from);
+        }
+
+        return OnChange.InvokeAsync(Filter with { Range = TimeRange.Custom, FromUtc = from, ToUtc = to });
+    }
+}

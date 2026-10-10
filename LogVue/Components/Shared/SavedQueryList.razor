@@ -1,0 +1,44 @@
+@if (Queries is null)
+{
+    <p class="lv-muted lv-small">Loading…</p>
+}
+else if (Queries.Count == 0)
+{
+    <p class="lv-muted lv-small">
+        Save a search with <Icon Name="bookmark" Class="lv-inline-icon" /> to come back to it in one click.
+    </p>
+}
+else
+{
+    <ul class="lv-saved">
+        @foreach (var query in Queries)
+        {
+            <li @key="query.Id" class="@(query.Query == ActiveQuery ? "is-active" : null)">
+                <button type="button" class="lv-saved-apply" title="@query.Query" @onclick="() => OnApply.InvokeAsync(query)">
+                    <Icon Name="bookmark" />
+                    <span>@query.Name</span>
+                </button>
+                @if (!ReadOnly)
+                {
+                    <button type="button" class="lv-icon-button lv-saved-delete" title="Delete saved query"
+                            @onclick="() => OnDelete.InvokeAsync(query)">
+                        <Icon Name="x" />
+                    </button>
+                }
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    /// <summary>Null while loading.</summary>
+    [Parameter] public IReadOnlyList<SavedQueryDto>? Queries { get; set; }
+
+    [Parameter] public string? ActiveQuery { get; set; }
+
+    [Parameter] public bool ReadOnly { get; set; }
+
+    [Parameter] public EventCallback<SavedQueryDto> OnApply { get; set; }
+
+    [Parameter] public EventCallback<SavedQueryDto> OnDelete { get; set; }
+}

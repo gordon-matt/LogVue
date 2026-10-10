@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="LogVue.Data/LogVue.Data.csproj" />
+  <Project Path="LogVue.Data.MySql/LogVue.Data.MySql.csproj" />
+  <Project Path="LogVue.Data.Npgsql/LogVue.Data.Npgsql.csproj" />
+  <Project Path="LogVue.Data.Sql/LogVue.Data.Sql.csproj" />
+  <Project Path="LogVue.Data.Sqlite/LogVue.Data.Sqlite.csproj" />
+  <Project Path="LogVue.Services/LogVue.Services.csproj" />
+  <Project Path="LogVue/LogVue.csproj" />
+  <Project Path="LogVue.Sample/LogVue.Sample.csproj" />
+  <Project Path="LogVue.Tests/LogVue.Tests.csproj" />
+</Solution>

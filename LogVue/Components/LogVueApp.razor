@@ -1,0 +1,30 @@
+@inject IOptions<LogVueOptions> Options
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <base href="@($"{Options.Value.BasePath}/")" />
+    <title>@Options.Value.Title</title>
+    <link rel="icon" type="image/svg+xml" href="@EmbeddedAssets.Url("favicon.svg")" />
+    <link rel="stylesheet" href="@EmbeddedAssets.Url("logvue.css")" />
+    @* Blocking on purpose: it applies the stored theme before first paint, so there is no flash. *@
+    <script src="@EmbeddedAssets.Url("theme.js")"></script>
+</head>
+
+<body>
+    <Routes @rendermode="LogVueRenderMode.Interactive" />
+
+    <div id="lv-boot" class="lv-boot">
+        <div class="lv-spinner" role="status" aria-label="Loading"></div>
+    </div>
+
+    <script src="_framework/blazor.web.js"
+            onerror="document.getElementById('lv-boot').innerHTML='<p>The dashboard script could not be loaded. Check that the host serves static web assets.</p>'"></script>
+    <script src="@EmbeddedAssets.Url("logvue.js")"></script>
+</body>
+
+</html>

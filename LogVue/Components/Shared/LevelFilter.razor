@@ -1,0 +1,43 @@
+<ul class="lv-levels" role="group" aria-label="Levels">
+    @foreach (var level in LogLevels.All)
+    {
+        bool isSelected = Filter.Levels.Contains(level);
+        long count = Counts?.FirstOrDefault(c => c.Level == level)?.Count ?? 0;
+        string name = level.ToString().ToLowerInvariant();
+
+        <li>
+            <button type="button" aria-pressed="@isSelected"
+                    class="lv-level-item lv-level-@name @(isSelected ? "is-selected" : Filter.Levels.Count > 0 ? "is-dimmed" : null)"
+                    title="@(isSelected ? $"Stop filtering on {level}" : $"Show {level}")"
+                    @onclick="() => OnChange.InvokeAsync(Filter.ToggleLevel(level))">
+                <span class="lv-level-check"><Icon Name="check" /></span>
+                <span class="lv-level-name">@level</span>
+                <span class="lv-level-count">@(Counts is null ? "–" : count.ToString("N0", CultureInfo.CurrentCulture))</span>
+                <span class="lv-level-bar" style="width: @BarWidth(count)"></span>
+            </button>
+        </li>
+    }
+</ul>
+
+<label class="lv-switch">
+    <input type="checkbox" checked="@Filter.ExceptionsOnly"
+           @onchange="e => OnChange.InvokeAsync(Filter with { ExceptionsOnly = e.Value is true })" />
+    <span class="lv-switch-track"></span>
+    <span>Only with exceptions</span>
+</label>
+
+@code {
+    [Parameter, EditorRequired] public DashboardFilter Filter { get; set; } = new();
+
+    /// <summary>Null while loading.</summary>
+    [Parameter] public IReadOnlyList<LevelCountDto>? Counts { get; set; }
+
+    [Parameter] public EventCallback<DashboardFilter> OnChange { get; set; }
+
+    private string BarWidth(long count)
+    {
+        long max = Counts?.Max(c => c.Count) ?? 0;
+        double percent = max == 0 ? 0 : Math.Max(count > 0 ? 2 : 0, count * 100.0 / max);
+        return percent.ToString("0.#", CultureInfo.InvariantCulture) + "%";
+    }
+}

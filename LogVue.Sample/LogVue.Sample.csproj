@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<!-- What the LogVue package imports into consumers automatically; a project reference doesn't. -->
+	<Import Project="..\LogVue\build\LogVue.props" />
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LogVue\LogVue.csproj" />
+		<ProjectReference Include="..\LogVue.Data.MySql\LogVue.Data.MySql.csproj" />
+		<ProjectReference Include="..\LogVue.Data.Npgsql\LogVue.Data.Npgsql.csproj" />
+		<ProjectReference Include="..\LogVue.Data.Sql\LogVue.Data.Sql.csproj" />
+		<ProjectReference Include="..\LogVue.Data.Sqlite\LogVue.Data.Sqlite.csproj" />
+	</ItemGroup>
+
+</Project>
