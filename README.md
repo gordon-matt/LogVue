@@ -16,6 +16,12 @@ LogVue is a modernised take on [Sejil](https://github.com/alaatm/Sejil), with:
   fetches new rows, set-based deletes (`ExecuteDelete`), and the search box compiles to SQL
   instead of being filtered in memory.
 
+## Screenshots
+
+<img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Screenshots/Theme_Dark.png" alt="Dark Theme" />
+
+<img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Screenshots/Theme_Light.png" alt="Light Theme" />
+
 ## Getting started
 
 Reference `LogVue` and one provider package:
