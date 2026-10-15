@@ -1,4 +1,4 @@
-# LogVue
+<img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Logo.png" alt="Logo" width="300" />
 
 An in-process log dashboard for ASP.NET Core apps that use Serilog. LogVue is a Serilog sink plus
 a Blazor dashboard shipped as a Razor Class Library: add a few lines to `Program.cs` and your app
