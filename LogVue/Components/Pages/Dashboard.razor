@@ -15,9 +15,20 @@
             <Icon Name="menu" />
         </button>
 
-        <a class="lv-brand" href="./" @onclick="ResetAsync" @onclick:preventDefault="true">
-            <img src="@EmbeddedAssets.Url("favicon.svg")" alt="" width="22" height="22" />
-            <span>@Settings.Title</span>
+        <a class="lv-brand" href="./" aria-label="@Settings.Title" @onclick="ResetAsync" @onclick:preventDefault="true">
+            @if (Branding.CustomLogoUrl(Settings) is { } logo)
+            {
+                <img class="lv-brand-custom" src="@logo" alt="" />
+            }
+            else if (Branding.HasCustomTitle(Settings))
+            {
+                <span>@Settings.Title</span>
+            }
+            else
+            {
+                <img class="lv-brand-logo" src="@EmbeddedAssets.Url("Logo.png")" alt="" width="114" height="34" />
+                <img class="lv-brand-icon" src="@EmbeddedAssets.Url("Icon.png")" alt="" width="31" height="28" />
+            }
         </a>
 
         <SearchBox Query="@filter.Query" Error="@queryError" CanSave="@(!Settings.ReadOnly)"

@@ -62,6 +62,7 @@ internal static class EmbeddedAssets
         ".css" => "text/css; charset=utf-8",
         ".js" => "text/javascript; charset=utf-8",
         ".svg" => "image/svg+xml",
+        ".png" => "image/png",
         _ => "application/octet-stream",
     };
 

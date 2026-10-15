@@ -13,6 +13,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="LogVue.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<!--
 		  Served by LogVue's own endpoint rather than as static web assets, so the dashboard works
 		  whether or not the host calls UseStaticFiles or MapStaticAssets.

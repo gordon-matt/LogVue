@@ -96,7 +96,8 @@ Bind them from configuration with
 
 | Option                        | Default    | Description |
 |-------------------------------|------------|-------------|
-| `Title`                       | `LogVue`   | Shown in the header and the browser tab. |
+| `Title`                       | `LogVue`   | Browser tab title. Shown in the header when it is not `LogVue` and `LogoPath` is unset. |
+| `LogoPath`                    |            | Header image. Overrides `Title`. Root-relative (`/logo.png`), app-relative (`~/logo.png`), or an absolute URL. |
 | `BasePath`                    | `/logvue`  | Where the dashboard is mounted. |
 | `ReadOnly`                    | `false`    | Hides and refuses deletes and level changes. |
 | `RetentionDays`               | `0`        | Deletes entries older than this. `0` keeps everything. |

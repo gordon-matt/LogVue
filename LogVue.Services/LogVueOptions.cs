@@ -6,8 +6,20 @@ public sealed class LogVueOptions
 {
     public const string SectionName = "LogVue";
 
-    /// <summary>Shown in the dashboard header and the browser tab.</summary>
-    public string Title { get; set; } = "LogVue";
+    public const string DefaultTitle = "LogVue";
+
+    /// <summary>
+    /// Browser tab title. Also shown in the header when <see cref="LogoPath"/> is unset and this
+    /// is not <see cref="DefaultTitle"/>.
+    /// </summary>
+    public string Title { get; set; } = DefaultTitle;
+
+    /// <summary>
+    /// Header image. Takes precedence over <see cref="Title"/>; otherwise a custom title is shown,
+    /// and the LogVue logo is used for the default title. A root-relative path (<c>/logo.png</c>),
+    /// an app-relative path (<c>~/logo.png</c>), or an absolute URL.
+    /// </summary>
+    public string? LogoPath { get; set; }
 
     /// <summary>Where the dashboard is mounted. Requests under this path are not logged by LogVue.</summary>
     public string BasePath { get; set; } = "/logvue";

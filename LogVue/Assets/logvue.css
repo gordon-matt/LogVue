@@ -103,6 +103,10 @@ p { margin: 0 0 0.75rem; }
     text-align: center;
 }
 
+.lv-boot-panel { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+.lv-boot-logo { height: 72px; width: auto; max-width: min(80vw, 420px); object-fit: contain; }
+.lv-boot-title { margin: 0; font-size: 22px; font-weight: 650; color: var(--lv-text); }
+
 .lv-spinner {
     width: 28px;
     height: 28px;
@@ -286,7 +290,10 @@ p { margin: 0 0 0.75rem; }
     white-space: nowrap;
 }
 
-.lv-brand span { overflow: hidden; text-overflow: ellipsis; }
+.lv-brand span { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.lv-brand-logo { height: 34px; width: auto; display: block; flex: none; }
+.lv-brand-icon { height: 28px; width: auto; display: none; flex: none; }
+.lv-brand-custom { display: block; height: auto; max-height: 34px; width: auto; max-width: 100%; object-fit: contain; }
 
 .lv-topbar-actions { display: flex; align-items: center; gap: 0.35rem; flex: none; }
 .lv-menu-button { display: none; }
@@ -907,8 +914,12 @@ p { margin: 0 0 0.75rem; }
 @media (max-width: 860px) {
     .lv-app, .lv-app.lv-details-open { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "main"; }
     .lv-menu-button { display: inline-flex; }
-    .lv-brand { width: auto; }
-    .lv-brand span, .lv-zone-button span, .lv-range-button span, .lv-live-button span:not(.lv-live-dot), .lv-kbd { display: none; }
+    .lv-brand { width: auto; flex: 0 1 auto; min-width: 0; }
+    .lv-brand-logo { display: none; }
+    .lv-brand-icon { display: block; }
+    .lv-brand span { max-width: 8.5rem; }
+    .lv-search-wrap { flex: 1 1 5rem; min-width: 3.25rem; }
+    .lv-zone-button span, .lv-range-button span, .lv-live-button span:not(.lv-live-dot), .lv-kbd { display: none; }
 
     .lv-sidebar {
         position: fixed;

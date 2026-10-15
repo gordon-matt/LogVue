@@ -9,7 +9,7 @@
     <meta name="robots" content="noindex" />
     <base href="@($"{Options.Value.BasePath}/")" />
     <title>@Options.Value.Title</title>
-    <link rel="icon" type="image/svg+xml" href="@EmbeddedAssets.Url("favicon.svg")" />
+    <link rel="icon" type="image/png" href="@EmbeddedAssets.Url("Icon.png")" />
     <link rel="stylesheet" href="@EmbeddedAssets.Url("logvue.css")" />
     @* Blocking on purpose: it applies the stored theme before first paint, so there is no flash. *@
     <script src="@EmbeddedAssets.Url("theme.js")"></script>
@@ -19,7 +19,21 @@
     <Routes @rendermode="LogVueRenderMode.Interactive" />
 
     <div id="lv-boot" class="lv-boot">
-        <div class="lv-spinner" role="status" aria-label="Loading"></div>
+        <div class="lv-boot-panel">
+            @if (Branding.CustomLogoUrl(Options.Value) is { } logo)
+            {
+                <img class="lv-boot-logo" src="@logo" alt="" />
+            }
+            else if (Branding.HasCustomTitle(Options.Value))
+            {
+                <p class="lv-boot-title">@Options.Value.Title</p>
+            }
+            else
+            {
+                <img class="lv-boot-logo" src="@EmbeddedAssets.Url("Logo.png")" alt="" width="241" height="72" />
+            }
+            <div class="lv-spinner" role="status" aria-label="Loading"></div>
+        </div>
     </div>
 
     <script src="_framework/blazor.web.js"
