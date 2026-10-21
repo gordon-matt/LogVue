@@ -30,6 +30,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\LogVue.Services\LogVue.Services.csproj" />
+		<ProjectReference Include="..\..\Heroicsoft.NetForge\Heroicsoft.NetForge.Components\Heroicsoft.NetForge.Components.csproj" />
 	</ItemGroup>
 
 </Project>

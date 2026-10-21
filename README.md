@@ -99,6 +99,7 @@ Bind them from configuration with
 | `Title`                       | `LogVue`   | Browser tab title. Shown in the header when it is not `LogVue` and `LogoPath` is unset. |
 | `LogoPath`                    |            | Header image. Overrides `Title`. Root-relative (`/logo.png`), app-relative (`~/logo.png`), or an absolute URL. |
 | `BasePath`                    | `/logvue`  | Where the dashboard is mounted. |
+| `Area`                        |            | Theme area. Set `Admin` to share the back-office theme; leave unset to follow the public site. |
 | `ReadOnly`                    | `false`    | Hides and refuses deletes and level changes. |
 | `RetentionDays`               | `0`        | Deletes entries older than this. `0` keeps everything. |
 | `RetentionInterval`           | 1 hour     | How often retention runs. |
@@ -157,8 +158,10 @@ props file that NuGet imports automatically.
   `wwwroot/_framework`) or call `builder.WebHost.UseStaticWebAssets()`. If the file is missing,
   `/logvue/_framework/blazor.web.js` returns a 404 explaining this.
 
-LogVue's own CSS, JavaScript and icon are embedded in the assembly and served with long-lived
-caching, so they need no setup.
+The dashboard uses the NetForge shell and the host's `ForgeUiOptions.ThemeStorageKey`, so a theme
+change here follows the rest of the site. Those stylesheets are static web assets, so the host
+calls `UseStaticFiles` (the sample does). LogVue's own page CSS and script stay embedded and are
+served from the mount path.
 
 ## Repository layout
 

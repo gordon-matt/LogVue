@@ -1,3 +1,7 @@
+using Heroicsoft.NetForge.Abstractions.Auth;
+using Heroicsoft.NetForge.Components;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 namespace LogVue;
 
 public static class ServiceCollectionExtensions
@@ -16,9 +20,10 @@ public static class ServiceCollectionExtensions
 
             // Safe alongside a host that is itself a Blazor app: both calls are idempotent.
             services.AddRazorComponents().AddInteractiveServerComponents();
-
-            // Scoped to the circuit, so one user's notifications stay theirs.
-            services.AddScoped<ToastService>();
+            // The shell reads ForgeUiOptions for the shared theme key. A host that also calls
+            // AddNetForgeComponents keeps its own key; this only fills the options in when it does not.
+            services.AddNetForgeComponents();
+            services.TryAddSingleton<IAuthProviderService>(new AuthProviderService(AuthProvider.Identity, null));
 
             return services;
         }

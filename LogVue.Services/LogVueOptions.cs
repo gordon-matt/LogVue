@@ -24,6 +24,13 @@ public sealed class LogVueOptions
     /// <summary>Where the dashboard is mounted. Requests under this path are not logged by LogVue.</summary>
     public string BasePath { get; set; } = "/logvue";
 
+    /// <summary>
+    /// Theme area for this document. Null uses the default area, so the dashboard follows the public site.
+    /// Set <c>Admin</c> when LogVue is the back office: it is mounted at <see cref="BasePath"/>,
+    /// not under <c>/Admin</c>, and should still share that area's saved theme.
+    /// </summary>
+    public string? Area { get; set; }
+
     /// <summary>Entries fetched per scroll step.</summary>
     public int PageSize { get; set; } = 100;
 

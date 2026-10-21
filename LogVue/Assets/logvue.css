@@ -1,29 +1,29 @@
-/* LogVue — self-contained, so it never inherits or leaks styles from the host application. */
+/* Page chrome for the log viewer. The shell, theme, and shared colours come from NetForge. */
 
 :root {
     --lv-row-height: 34px; /* Virtualize's ItemSize in Dashboard.razor depends on this. */
-    --lv-sidebar-width: 264px;
-    --lv-topbar-height: 56px;
-    --lv-radius: 8px;
-    --lv-radius-small: 6px;
-    --lv-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --lv-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+    --lv-sidebar-width: var(--nf-sidebar-width);
+    --lv-topbar-height: var(--nf-topbar-height);
+    --lv-radius: var(--nf-radius);
+    --lv-radius-small: var(--nf-radius-small);
+    --lv-font: var(--nf-font);
+    --lv-mono: var(--nf-mono);
 
-    --lv-bg: #f6f7f9;
-    --lv-surface: #ffffff;
-    --lv-surface-2: #f1f3f6;
-    --lv-hover: #f3f4f8;
-    --lv-border: #e2e5ea;
-    --lv-border-soft: #eef0f3;
-    --lv-text: #1a1e24;
-    --lv-muted: #6b7380;
-    --lv-accent: #4f46e5;
-    --lv-accent-text: #ffffff;
-    --lv-accent-soft: rgba(79, 70, 229, 0.10);
-    --lv-danger: #dc2626;
-    --lv-success: #16a34a;
-    --lv-shadow: 0 10px 30px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.06);
-    --lv-selected: rgba(79, 70, 229, 0.08);
+    --lv-bg: var(--nf-bg);
+    --lv-surface: var(--nf-surface);
+    --lv-surface-2: var(--nf-surface-2);
+    --lv-hover: var(--nf-hover);
+    --lv-border: var(--nf-border);
+    --lv-border-soft: var(--nf-border-soft);
+    --lv-text: var(--nf-text);
+    --lv-muted: var(--nf-muted);
+    --lv-accent: var(--nf-accent);
+    --lv-accent-text: var(--nf-accent-text);
+    --lv-accent-soft: var(--nf-accent-soft);
+    --lv-danger: var(--nf-danger);
+    --lv-success: var(--nf-success);
+    --lv-shadow: var(--nf-shadow);
+    --lv-selected: var(--nf-selected);
 
     --lv-verbose: #94a3b8;
     --lv-debug: #64748b;
@@ -35,27 +35,9 @@
     --lv-tok-string: #0f766e;
     --lv-tok-number: #7c3aed;
     --lv-tok-value: #b45309;
-
-    color-scheme: light;
 }
 
 [data-theme="dark"] {
-    --lv-bg: #0d1015;
-    --lv-surface: #151920;
-    --lv-surface-2: #1b2029;
-    --lv-hover: #1c212a;
-    --lv-border: #283040;
-    --lv-border-soft: #1f2530;
-    --lv-text: #e5e8ee;
-    --lv-muted: #8c95a5;
-    --lv-accent: #818cf8;
-    --lv-accent-text: #0d1015;
-    --lv-accent-soft: rgba(129, 140, 248, 0.14);
-    --lv-danger: #f87171;
-    --lv-success: #4ade80;
-    --lv-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
-    --lv-selected: rgba(129, 140, 248, 0.12);
-
     --lv-verbose: #7c8799;
     --lv-debug: #94a3b8;
     --lv-information: #60a5fa;
@@ -66,8 +48,6 @@
     --lv-tok-string: #5eead4;
     --lv-tok-number: #c4b5fd;
     --lv-tok-value: #fcd34d;
-
-    color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -104,6 +84,7 @@ p { margin: 0 0 0.75rem; }
 }
 
 .lv-boot-panel { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+.lv-boot .nf-spinner { width: 28px; height: 28px; border-width: 3px; }
 .lv-boot-logo { height: 72px; width: auto; max-width: min(80vw, 420px); object-fit: contain; }
 .lv-boot-title { margin: 0; font-size: 22px; font-weight: 650; color: var(--lv-text); }
 
@@ -122,7 +103,10 @@ p { margin: 0 0 0.75rem; }
 
 /* ---------- Icons and buttons ---------- */
 
-.lv-icon { width: 16px; height: 16px; flex: none; }
+.lv-icon,
+.lv-icon-button .nf-icon,
+.lv-button .nf-icon,
+.lv-saved .nf-icon { width: 16px; height: 16px; flex: none; }
 .lv-inline-icon { width: 13px; height: 13px; vertical-align: -2px; }
 
 .lv-button {
@@ -251,64 +235,30 @@ p { margin: 0 0 0.75rem; }
 
 /* ---------- Layout ---------- */
 
-.lv-app {
-    display: grid;
-    grid-template-columns: var(--lv-sidebar-width) minmax(0, 1fr);
-    grid-template-rows: var(--lv-topbar-height) minmax(0, 1fr);
-    grid-template-areas: "top top" "side main";
-    height: 100vh;
-    height: 100dvh;
-}
-
-.lv-app.lv-details-open {
-    grid-template-columns: var(--lv-sidebar-width) minmax(0, 1fr) minmax(360px, 38%);
-    grid-template-areas: "top top top" "side main details";
-}
-
-.lv-topbar {
-    grid-area: top;
+.nf-content:has(.lv-page) {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0 0.9rem;
-    background: var(--lv-surface);
-    border-bottom: 1px solid var(--lv-border);
-    z-index: 20;
-}
-
-.lv-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    width: calc(var(--lv-sidebar-width) - 1.65rem);
-    flex: none;
-    color: inherit;
-    text-decoration: none;
-    font-weight: 650;
-    font-size: 15px;
+    flex-direction: column;
+    padding: 0;
     overflow: hidden;
-    white-space: nowrap;
 }
 
-.lv-brand span { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.lv-brand-logo { height: 34px; width: auto; display: block; flex: none; }
-.lv-brand-icon { height: 28px; width: auto; display: none; flex: none; }
-.lv-brand-custom { display: block; height: auto; max-height: 34px; width: auto; max-width: 100%; object-fit: contain; }
+.lv-page {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+}
 
 .lv-topbar-actions { display: flex; align-items: center; gap: 0.35rem; flex: none; }
-.lv-menu-button { display: none; }
 .lv-zone-button span { font-size: 12.5px; }
 
-.lv-sidebar {
-    grid-area: side;
-    overflow-y: auto;
-    padding: 1rem 0.9rem 1.25rem;
-    background: var(--lv-surface);
-    border-right: 1px solid var(--lv-border);
+.lv-filters {
     display: flex;
     flex-direction: column;
     gap: 1.4rem;
 }
+
+.nf-sidebar .nf-brand-logo { max-width: 100%; }
 
 .lv-sidebar-heading {
     display: flex;
@@ -323,17 +273,13 @@ p { margin: 0 0 0.75rem; }
 }
 
 .lv-sidebar-heading .lv-link-button { text-transform: none; letter-spacing: 0; }
-.lv-store { margin-top: auto; }
-
 .lv-main {
-    grid-area: main;
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
     min-width: 0;
     min-height: 0;
 }
-
-.lv-scrim { display: none; }
 
 /* ---------- Search ---------- */
 
@@ -507,7 +453,7 @@ p { margin: 0 0 0.75rem; }
     color: transparent;
 }
 
-.lv-level-check .lv-icon { width: 11px; height: 11px; stroke-width: 3.5; }
+.lv-level-check .nf-icon { width: 11px; height: 11px; stroke-width: 3.5; }
 .lv-level-item.is-selected .lv-level-check { background: var(--lv-c); color: var(--lv-surface); }
 .lv-level-count { font-variant-numeric: tabular-nums; font-size: 12.5px; color: var(--lv-muted); }
 
@@ -725,8 +671,8 @@ p { margin: 0 0 0.75rem; }
 /* ---------- Details ---------- */
 
 .lv-details {
-    grid-area: details;
     display: flex;
+    flex: 0 0 min(440px, 42%);
     flex-direction: column;
     min-width: 0;
     min-height: 0;
@@ -895,14 +841,13 @@ p { margin: 0 0 0.75rem; }
 /* ---------- Narrow screens ---------- */
 
 @media (max-width: 1100px) {
-    .lv-app.lv-details-open { grid-template-columns: var(--lv-sidebar-width) minmax(0, 1fr); grid-template-areas: "top top" "side main"; }
-
     .lv-details {
         position: fixed;
         top: var(--lv-topbar-height);
         right: 0;
         bottom: 0;
         width: min(520px, 100vw);
+        flex: none;
         z-index: 30;
         box-shadow: var(--lv-shadow);
     }
@@ -912,28 +857,8 @@ p { margin: 0 0 0.75rem; }
 }
 
 @media (max-width: 860px) {
-    .lv-app, .lv-app.lv-details-open { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "main"; }
-    .lv-menu-button { display: inline-flex; }
-    .lv-brand { width: auto; flex: 0 1 auto; min-width: 0; }
-    .lv-brand-logo { display: none; }
-    .lv-brand-icon { display: block; }
-    .lv-brand span { max-width: 8.5rem; }
     .lv-search-wrap { flex: 1 1 5rem; min-width: 3.25rem; }
     .lv-zone-button span, .lv-range-button span, .lv-live-button span:not(.lv-live-dot), .lv-kbd { display: none; }
-
-    .lv-sidebar {
-        position: fixed;
-        top: var(--lv-topbar-height);
-        bottom: 0;
-        left: 0;
-        width: min(300px, 86vw);
-        z-index: 35;
-        transform: translateX(-100%);
-        transition: transform 0.18s ease-out;
-    }
-
-    .lv-sidebar-open .lv-sidebar { transform: none; box-shadow: var(--lv-shadow); }
-    .lv-sidebar-open .lv-scrim { display: block; position: fixed; inset: var(--lv-topbar-height) 0 0 0; z-index: 34; background: rgba(10, 12, 16, 0.35); }
 
     .lv-list { margin: 0 0.5rem 0.5rem; }
     .lv-list-head, .lv-row { grid-template-columns: 6.2rem 2.75rem minmax(0, 1fr) 0; gap: 0.5rem; }

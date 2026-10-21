@@ -58,6 +58,7 @@ builder.Services.AddHostedService<SampleTrafficGenerator>();
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
+app.UseStaticFiles();
 
 app.MapGet("/", () => Results.Redirect("/logvue"));
 

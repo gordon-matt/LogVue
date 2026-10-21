@@ -1,7 +1,8 @@
 @inject IOptions<LogVueOptions> Options
+@inject IOptions<ForgeUiOptions> UiOptions
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="@InitialTheme" data-nf-storage-key="@StorageKey" data-nf-theme-area="@ResolvedArea">
 
 <head>
     <meta charset="utf-8" />
@@ -10,9 +11,18 @@
     <base href="@($"{Options.Value.BasePath}/")" />
     <title>@Options.Value.Title</title>
     <link rel="icon" type="image/png" href="@EmbeddedAssets.Url("Icon.png")" />
+    @* Root-relative: the base href is the mount path, and these files are the host's static web assets. *@
+    <script src="/_content/Heroicsoft.NetForge.Components/js/theme-init.js"
+            data-theme-key="@Ui.ThemeStorageKey"
+            data-default-theme="@DefaultScheme"
+            data-theme-areas="@AreasAttribute"
+            data-theme-area="@PinnedArea"></script>
+    <link rel="stylesheet" href="/_content/Heroicsoft.NetForge.Components/css/nf.css" />
+    @if (AccentCss is not null)
+    {
+        <style>@((MarkupString)AccentCss)</style>
+    }
     <link rel="stylesheet" href="@EmbeddedAssets.Url("logvue.css")" />
-    @* Blocking on purpose: it applies the stored theme before first paint, so there is no flash. *@
-    <script src="@EmbeddedAssets.Url("theme.js")"></script>
 </head>
 
 <body>
@@ -32,13 +42,42 @@
             {
                 <img class="lv-boot-logo" src="@EmbeddedAssets.Url("Logo.png")" alt="" width="241" height="72" />
             }
-            <div class="lv-spinner" role="status" aria-label="Loading"></div>
+            <div class="nf-spinner" role="status" aria-label="Loading"></div>
         </div>
     </div>
 
     <script src="_framework/blazor.web.js"
             onerror="document.getElementById('lv-boot').innerHTML='<p>The dashboard script could not be loaded. Check that the host serves static web assets.</p>'"></script>
+    <script src="/_content/Heroicsoft.NetForge.Components/js/nf.js"></script>
     <script src="@EmbeddedAssets.Url("logvue.js")"></script>
 </body>
 
 </html>
+
+@code {
+    private ForgeUiOptions Ui => UiOptions.Value;
+
+    private string ResolvedArea => ThemeStorage.NormalizeArea(Options.Value.Area);
+
+    private string StorageKey => ThemeStorage.KeyFor(Ui.ThemeStorageKey, ResolvedArea);
+
+    /// <summary>Null leaves the attribute off, so a mount under <c>/Admin</c> follows the URL.</summary>
+    private string? PinnedArea => string.IsNullOrWhiteSpace(Options.Value.Area) ? null : ResolvedArea;
+
+    private string? AreasAttribute => ThemeStorage.AreasAttribute(Ui.Areas);
+
+    private string? AccentCss => ForgeAccentCss.Build(Ui);
+
+    private string InitialTheme =>
+        string.Equals(ThemeStorage.ValueFor(ResolvedArea, Ui.Areas, Ui.DefaultColorScheme ?? "light"), "dark", StringComparison.OrdinalIgnoreCase)
+            ? "dark"
+            : "light";
+
+    private string DefaultScheme =>
+        Ui.DefaultColorScheme?.Trim().ToLowerInvariant() switch
+        {
+            "dark" => "dark",
+            "system" => "system",
+            _ => "light",
+        };
+}

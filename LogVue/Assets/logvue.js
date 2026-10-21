@@ -27,7 +27,7 @@
 
                 if (e.key === 'Escape') {
                     // A dialog handles its own dismissal.
-                    if (!document.querySelector('.lv-modal')) {
+                    if (!document.querySelector('.lv-modal, .nf-modal')) {
                         dotnet.invokeMethodAsync('OnShortcut', 'Escape');
                     }
                     return;
@@ -55,14 +55,8 @@
 
             return {
                 timeZone,
-                utc: storage.get('logvue.utc') === '1',
-                theme: document.documentElement.getAttribute('data-theme') || 'light'
+                utc: storage.get('logvue.utc') === '1'
             };
-        },
-
-        setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            storage.set('logvue.theme', theme);
         },
 
         setUtc(utc) {

@@ -9,120 +9,111 @@
 @inject TimeProvider TimeProvider
 @inject IJSRuntime JS
 
-<div class="lv-app @(sidebarOpen ? "lv-sidebar-open" : null) @(selected is null ? null : "lv-details-open")">
-    <header class="lv-topbar">
-        <button type="button" class="lv-icon-button lv-menu-button" aria-label="Toggle sidebar" @onclick="() => sidebarOpen = !sidebarOpen">
-            <Icon Name="menu" />
-        </button>
-
-        <a class="lv-brand" href="./" aria-label="@Settings.Title" @onclick="ResetAsync" @onclick:preventDefault="true">
-            @if (Branding.CustomLogoUrl(Settings) is { } logo)
-            {
-                <img class="lv-brand-custom" src="@logo" alt="" />
-            }
-            else if (Branding.HasCustomTitle(Settings))
-            {
-                <span>@Settings.Title</span>
-            }
-            else
-            {
-                <img class="lv-brand-logo" src="@EmbeddedAssets.Url("Logo.png")" alt="" width="114" height="34" />
-                <img class="lv-brand-icon" src="@EmbeddedAssets.Url("Icon.png")" alt="" width="31" height="28" />
-            }
-        </a>
-
+<AppShell ShowSearch="false" ShowThemePicker="false" ShowUserMenu="false" ShowVersion="false" CollapsibleSidebar="false">
+    <Sidebar>
+        <nav class="nf-sidebar" id="nf-sidebar" aria-label="Filters">
+            <div class="nf-sidebar-brand">
+                <a class="nf-brand-link" href="./" aria-label="@Settings.Title" @onclick="ResetAsync" @onclick:preventDefault="true">
+                    @if (Branding.CustomLogoUrl(Settings) is { } logo)
+                    {
+                        <img class="nf-brand-logo" src="@logo" alt="" />
+                    }
+                    else if (Branding.HasCustomTitle(Settings))
+                    {
+                        <span class="nf-brand-text">@Settings.Title</span>
+                    }
+                    else
+                    {
+                        <img class="nf-brand-logo" src="@EmbeddedAssets.Url("Logo.png")" alt="" width="114" height="34" />
+                    }
+                </a>
+            </div>
+            <div class="nf-sidebar-scroll">
+                <div class="lv-filters">
+                    <section>
+                        <h3 class="lv-sidebar-heading">
+                            Levels
+                            @if (filter.Levels.Count > 0)
+                            {
+                                <button type="button" class="lv-link-button" @onclick="() => ApplyFilterAsync(filter with { Levels = new HashSet<LogEventLevel>() })">
+                                    Show all
+                                </button>
+                            }
+                        </h3>
+                        <LevelFilter Filter="filter" Counts="levelCounts" OnChange="ApplyFilterAsync" />
+                    </section>
+                    <section>
+                        <h3 class="lv-sidebar-heading">Saved queries</h3>
+                        <SavedQueryList Queries="savedQueries" ActiveQuery="@filter.Query" ReadOnly="Settings.ReadOnly"
+                                        OnApply="q => ApplyQueryAsync(q.Query)" OnDelete="DeleteSavedQueryAsync" />
+                    </section>
+                </div>
+            </div>
+            <div class="nf-sidebar-footer">
+                <h3 class="lv-sidebar-heading">Log store</h3>
+                <dl class="lv-store-facts">
+                    <dt><Icon Name="database" /> Provider</dt>
+                    <dd>@(summary?.ProviderName ?? "–")</dd>
+                    <dt>Entries</dt>
+                    <dd>@(summary is null ? "–" : summary.TotalCount.ToString("N0", CultureInfo.CurrentCulture))</dd>
+                    <dt>Oldest</dt>
+                    <dd title="@(summary?.OldestUtc is DateTime oldest ? time.FormatLong(oldest) : null)">
+                        @(summary?.OldestUtc is DateTime o ? TimeDisplay.Relative(o, UtcNow) : "–")
+                    </dd>
+                    @if (Settings.RetentionDays > 0)
+                    {
+                        <dt>Retention</dt>
+                        <dd>@Settings.RetentionDays days</dd>
+                    }
+                </dl>
+                <label class="lv-field">
+                    <span>Store events at or above</span>
+                    <select class="lv-input" disabled="@Settings.ReadOnly" value="@minimumLevel" @onchange="SetMinimumLevel">
+                        @foreach (var level in LogLevels.All.Reverse())
+                        {
+                            <option value="@level">@level</option>
+                        }
+                    </select>
+                </label>
+                @if (Settings.ReadOnly)
+                {
+                    <p class="lv-muted lv-small">The dashboard is read-only.</p>
+                }
+                else
+                {
+                    <button type="button" class="lv-button lv-button-block" @onclick="OpenCleanupAsync">
+                        <Icon Name="trash" /> Delete entries…
+                    </button>
+                }
+            </div>
+        </nav>
+    </Sidebar>
+    <TopbarCenter>
         <SearchBox Query="@filter.Query" Error="@queryError" CanSave="@(!Settings.ReadOnly)"
                    OnSearch="ApplyQueryAsync" OnSave="SaveQueryAsync" />
-
+    </TopbarCenter>
+    <TopbarEnd>
         <div class="lv-topbar-actions">
             <TimeRangePicker Filter="filter" Time="time" OnChange="ApplyFilterAsync" />
-
             <button type="button" class="lv-button lv-live-button @(isLive ? "is-live" : null)" aria-pressed="@isLive"
                     title="@(isLive ? "Stop following new entries" : $"Follow new entries every {Settings.LiveRefreshInterval.TotalSeconds:0.#}s")"
                     @onclick="ToggleLive">
                 <span class="lv-live-dot"></span>
                 <span>Live</span>
             </button>
-
             <button type="button" class="lv-icon-button" title="Refresh" disabled="@isLoading" @onclick="RefreshAsync">
                 <Icon Name="refresh" Class="@(isLoading ? "lv-spin" : null)" />
             </button>
-
             <button type="button" class="lv-icon-button lv-zone-button" title="@($"Showing times in {time.Label}. Switch to {(showUtc ? browserTime.Label : "UTC")}.")"
                     @onclick="ToggleUtcAsync">
                 <Icon Name="globe" />
                 <span>@(showUtc ? "UTC" : "Local")</span>
             </button>
-
-            <button type="button" class="lv-icon-button" title="@(theme == "dark" ? "Light theme" : "Dark theme")" @onclick="ToggleThemeAsync">
-                <Icon Name="@(theme == "dark" ? "sun" : "moon")" />
-            </button>
+            <ThemeToggle />
         </div>
-    </header>
-
-    <div class="lv-scrim" @onclick="() => sidebarOpen = false"></div>
-
-    <aside class="lv-sidebar">
-        <section class="lv-sidebar-section">
-            <h3 class="lv-sidebar-heading">
-                Levels
-                @if (filter.Levels.Count > 0)
-                {
-                    <button type="button" class="lv-link-button" @onclick="() => ApplyFilterAsync(filter with { Levels = new HashSet<LogEventLevel>() })">
-                        Show all
-                    </button>
-                }
-            </h3>
-            <LevelFilter Filter="filter" Counts="levelCounts" OnChange="ApplyFilterAsync" />
-        </section>
-
-        <section class="lv-sidebar-section">
-            <h3 class="lv-sidebar-heading">Saved queries</h3>
-            <SavedQueryList Queries="savedQueries" ActiveQuery="@filter.Query" ReadOnly="Settings.ReadOnly"
-                            OnApply="q => ApplyQueryAsync(q.Query)" OnDelete="DeleteSavedQueryAsync" />
-        </section>
-
-        <section class="lv-sidebar-section lv-store">
-            <h3 class="lv-sidebar-heading">Log store</h3>
-            <dl class="lv-store-facts">
-                <dt><Icon Name="database" /> Provider</dt>
-                <dd>@(summary?.ProviderName ?? "–")</dd>
-                <dt>Entries</dt>
-                <dd>@(summary is null ? "–" : summary.TotalCount.ToString("N0", CultureInfo.CurrentCulture))</dd>
-                <dt>Oldest</dt>
-                <dd title="@(summary?.OldestUtc is DateTime oldest ? time.FormatLong(oldest) : null)">
-                    @(summary?.OldestUtc is DateTime o ? TimeDisplay.Relative(o, UtcNow) : "–")
-                </dd>
-                @if (Settings.RetentionDays > 0)
-                {
-                    <dt>Retention</dt>
-                    <dd>@Settings.RetentionDays days</dd>
-                }
-            </dl>
-
-            <label class="lv-field">
-                <span>Store events at or above</span>
-                <select class="lv-input" disabled="@Settings.ReadOnly" value="@minimumLevel" @onchange="SetMinimumLevel">
-                    @foreach (var level in LogLevels.All.Reverse())
-                    {
-                        <option value="@level">@level</option>
-                    }
-                </select>
-            </label>
-
-            @if (Settings.ReadOnly)
-            {
-                <p class="lv-muted lv-small">The dashboard is read-only.</p>
-            }
-            else
-            {
-                <button type="button" class="lv-button lv-button-block lv-danger-hover" @onclick="OpenCleanupAsync">
-                    <Icon Name="trash" /> Delete entries…
-                </button>
-            }
-        </section>
-    </aside>
-
+    </TopbarEnd>
+    <ChildContent>
+    <div class="lv-page @(selected is null ? null : "lv-details-open")">
     <main class="lv-main">
         <div class="lv-results-bar">
             <span class="lv-results-count">
@@ -248,12 +239,13 @@
         <LogEntryDetails Entry="selected" Time="time" ReadOnly="Settings.ReadOnly"
                          OnClose="() => selected = null" OnDelete="DeleteEntryAsync" OnFilter="AddConditionAsync" />
     }
-</div>
+    </div>
+    </ChildContent>
+</AppShell>
 
 <CleanupDialog @ref="cleanupDialog" />
 <ConfirmDialog @ref="confirmDialog" />
 <PromptDialog @ref="promptDialog" />
-<Toaster />
 
 @code {
     /// <summary>Must match <c>--lv-row-height</c> in logvue.css, which Virtualize relies on.</summary>
@@ -284,8 +276,6 @@
     private TimeDisplay time = TimeDisplay.Utc;
     private TimeDisplay browserTime = TimeDisplay.Utc;
     private bool showUtc;
-    private string theme = "light";
-    private bool sidebarOpen;
     private bool isLive;
     private bool atTop = true;
 
@@ -332,7 +322,6 @@
             var preferences = await JS.InvokeAsync<BrowserPreferences>("logVue.init", selfReference);
             browserTime = TimeDisplay.ForBrowser(preferences.TimeZone);
             showUtc = preferences.Utc;
-            theme = preferences.Theme;
             time = showUtc ? TimeDisplay.Utc : browserTime;
 
             listObserver = await JS.InvokeAsync<IJSObjectReference>(
@@ -364,7 +353,6 @@
 
     private Task ApplyFilterAsync(DashboardFilter next)
     {
-        sidebarOpen = false;
         Navigation.NavigateTo(next.ToUri(Navigation));
         return Task.CompletedTask;
     }
@@ -668,8 +656,6 @@
 
     private async Task OpenCleanupAsync()
     {
-        sidebarOpen = false;
-
         int? deleted = await cleanupDialog.ShowAsync(filter.ToLogFilter(UtcNow), filter.HasCriteria, DescribeFilter());
 
         if (deleted is int count)
@@ -792,12 +778,6 @@
         }
     }
 
-    private async Task ToggleThemeAsync()
-    {
-        theme = theme == "dark" ? "light" : "dark";
-        await JS.InvokeVoidAsync("logVue.setTheme", theme);
-    }
-
     private async Task ToggleUtcAsync()
     {
         showUtc = !showUtc;
@@ -830,7 +810,6 @@
         {
             case "Escape":
                 selected = null;
-                sidebarOpen = false;
                 break;
 
             case "j" or "k" when entries is { Count: > 0 }:
@@ -877,5 +856,5 @@
         selfReference?.Dispose();
     }
 
-    private sealed record BrowserPreferences(string? TimeZone, bool Utc, string Theme);
+    private sealed record BrowserPreferences(string? TimeZone, bool Utc);
 }
