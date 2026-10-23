@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Description>An in-process Blazor dashboard for viewing, querying and deleting your ASP.NET Core application's Serilog events.</Description>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -29,8 +29,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="Heroicsoft.NetForge.Components" Version="1.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\LogVue.Services\LogVue.Services.csproj" />
-		<ProjectReference Include="..\..\Heroicsoft.NetForge\Heroicsoft.NetForge.Components\Heroicsoft.NetForge.Components.csproj" />
 	</ItemGroup>
 
 </Project>
