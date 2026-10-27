@@ -21,7 +21,11 @@ LogVue is a modernised take on [Sejil](https://github.com/alaatm/Sejil), with:
 
 ## Screenshots
 
+<img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Screenshots/Overview_Dark.png" alt="Dark Theme" />
+
 <img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Screenshots/Theme_Dark.png" alt="Dark Theme" />
+
+<img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Screenshots/Overview_Light.png" alt="Light Theme" />
 
 <img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Screenshots/Theme_Light.png" alt="Light Theme" />
 
