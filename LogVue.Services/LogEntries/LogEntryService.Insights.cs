@@ -243,7 +243,7 @@ public sealed partial class LogEntryService
         TimeSpan bucket,
         List<VolumeHit> hits)
     {
-        var totals = new Dictionary<DateTime, Dictionary<LogEventLevel, long>>();
+        var totals = new Dictionary<DateTime, Dictionary<LogVueLevel, long>>();
 
         foreach (var hit in hits)
         {
@@ -365,5 +365,5 @@ public sealed partial class LogEntryService
     private static DateTime Next(DateTime cursor, TimeSpan bucket) =>
         bucket >= TimeSpan.FromDays(28) ? cursor.AddMonths(1) : cursor.Add(bucket);
 
-    private sealed record VolumeHit(DateTime Timestamp, LogEventLevel Level, int Count);
+    private sealed record VolumeHit(DateTime Timestamp, LogVueLevel Level, int Count);
 }

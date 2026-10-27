@@ -1,6 +1,4 @@
 using LogVue.Infrastructure;
-using Serilog.Events;
-
 namespace LogVue.Tests.Infrastructure;
 
 public class DashboardFilterTests
@@ -12,7 +10,7 @@ public class DashboardFilterTests
             "http://localhost/logvue/?q=StatusCode%20%3D%20500&levels=err,wrn,bogus&ex=1&range=custom&from=2026-10-01T00:00:00Z&to=2026-10-02T12:30:00Z");
 
         Assert.Equal("StatusCode = 500", filter.Query);
-        Assert.Equal([LogEventLevel.Warning, LogEventLevel.Error], filter.Levels.Order());
+        Assert.Equal([LogVueLevel.Warning, LogVueLevel.Error], filter.Levels.Order());
         Assert.True(filter.ExceptionsOnly);
         Assert.Equal(TimeRange.Custom, filter.Range);
         Assert.Equal(new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc), filter.FromUtc);
@@ -43,9 +41,9 @@ public class DashboardFilterTests
     [Fact]
     public void ToggleLevel_AddsThenRemoves()
     {
-        var filter = new DashboardFilter().ToggleLevel(LogEventLevel.Error);
-        Assert.Contains(LogEventLevel.Error, filter.Levels);
+        var filter = new DashboardFilter().ToggleLevel(LogVueLevel.Error);
+        Assert.Contains(LogVueLevel.Error, filter.Levels);
 
-        Assert.Empty(filter.ToggleLevel(LogEventLevel.Error).Levels);
+        Assert.Empty(filter.ToggleLevel(LogVueLevel.Error).Levels);
     }
 }

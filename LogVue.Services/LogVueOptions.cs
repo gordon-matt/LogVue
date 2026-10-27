@@ -1,4 +1,4 @@
-using Serilog.Core;
+using LogVue.Providers;
 
 namespace LogVue;
 
@@ -35,11 +35,18 @@ public sealed class LogVueOptions
     public int PageSize { get; set; } = 100;
 
     /// <summary>
-    /// Controls which events LogVue stores, and is what the dashboard's level picker changes. Pass
-    /// the switch that also controls Serilog's global minimum level to have the picker govern
-    /// every sink instead.
+    /// Lowest level stored when the host starts. The dashboard picker changes the live level after
+    /// that. A Serilog host that wants the picker to govern every sink calls
+    /// <c>AddLogVueSerilog</c> with its own <c>LoggingLevelSwitch</c>.
     /// </summary>
-    public LoggingLevelSwitch LevelSwitch { get; set; } = new(LogEventLevel.Information);
+    public LogVueLevel MinimumLevel { get; set; } = LogVueLevel.Information;
+
+    /// <summary>
+    /// Registers the <c>Microsoft.Extensions.Logging</c> provider. Leave this on so <c>ILogger</c>
+    /// calls are stored. Turn it off when events already arrive through another provider, such as
+    /// the Serilog sink combined with <c>writeToProviders: true</c>, which would store each event twice.
+    /// </summary>
+    public bool UseLoggerProvider { get; set; } = true;
 
     /// <summary>Hides and refuses deleting entries and changing the minimum level.</summary>
     public bool ReadOnly { get; set; }

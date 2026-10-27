@@ -9,7 +9,7 @@ public class LogEntryProperty : BaseEntity<long>
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// The property rendered as text. Scalars are stored without Serilog's surrounding quotes so a
+    /// The property rendered as text. Scalars are stored without surrounding quotes so a
     /// query for <c>SourceContext = 'MyApp.Worker'</c> matches what the user sees.
     /// </summary>
     public string? Value { get; set; }

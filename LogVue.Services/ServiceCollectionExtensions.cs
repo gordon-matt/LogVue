@@ -1,9 +1,11 @@
+using LogVue.Providers;
 using LogVue.Services.Hosting;
 using LogVue.Services.LogEntries;
 using LogVue.Services.Logging;
 using LogVue.Services.SavedQueries;
 using LogVue.Services.Settings;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace LogVue.Services;
 
@@ -12,8 +14,8 @@ public static class ServiceCollectionExtensions
     extension(IServiceCollection services)
     {
         /// <summary>
-        /// Registers LogVue's services, sink and background work. A storage provider must be added
-        /// as well, from one of the <c>LogVue.Data.*</c> packages.
+        /// Registers LogVue's services, the Microsoft logger provider and background work. A storage
+        /// provider must be added as well, from one of the <c>LogVue.Data.*</c> packages.
         /// </summary>
         public IServiceCollection AddLogVueServices(Action<LogVueOptions>? configure = null)
         {
@@ -25,7 +27,11 @@ public static class ServiceCollectionExtensions
             services.TryAddSingleton<ILogVueQueryDialect, DefaultQueryDialect>();
 
             services.TryAddSingleton<LogVueDatabaseState>();
-            services.TryAddSingleton<LogVueSink>();
+            services.TryAddSingleton<LogLevelGate>();
+            services.TryAddSingleton<ILogLevelGate>(provider => provider.GetRequiredService<LogLevelGate>());
+            services.TryAddSingleton<LogEventQueue>();
+            services.TryAddSingleton<ILogEventWriter>(provider => provider.GetRequiredService<LogEventQueue>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, LogVueLoggerProvider>());
 
             // Closed registrations against LogVue's own factory. A host built on Extenso maps the
             // open IRepository<> to its own IDbContextFactory, and closed registrations win, so
@@ -40,6 +46,7 @@ public static class ServiceCollectionExtensions
 
             services.AddHostedService<LogVueDatabaseInitializer>();
             services.AddHostedService<LogVueRetentionService>();
+            services.AddHostedService<LogIngestionService>();
 
             return services;
         }

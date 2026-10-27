@@ -3,6 +3,8 @@
     <File Path="Directory.Build.props" />
     <File Path="README.md" />
   </Folder>
+  <Project Path="LogVue.Providers.Abstractions/LogVue.Providers.Abstractions.csproj" />
+  <Project Path="LogVue.Providers.Serilog/LogVue.Providers.Serilog.csproj" />
   <Project Path="LogVue.Data/LogVue.Data.csproj" />
   <Project Path="LogVue.Data.MySql/LogVue.Data.MySql.csproj" />
   <Project Path="LogVue.Data.Npgsql/LogVue.Data.Npgsql.csproj" />

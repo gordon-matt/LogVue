@@ -1,7 +1,5 @@
 using Ardalis.Result;
 using LogVue.Models;
-using Serilog.Events;
-
 namespace LogVue.Tests.Services;
 
 public class LogEntryServiceTests : IDisposable
@@ -68,17 +66,17 @@ public class LogEntryServiceTests : IDisposable
     public async Task SearchAsync_CombinesLevelsExceptionsAndTimeRange()
     {
         var now = DateTime.UtcNow;
-        await database.AddAsync("old error", LogEventLevel.Error, now.AddHours(-3), "boom");
-        await database.AddAsync("error with exception", LogEventLevel.Error, now, "boom");
-        await database.AddAsync("error without exception", LogEventLevel.Error, now);
-        await database.AddAsync("warning with exception", LogEventLevel.Warning, now, "boom");
-        await database.AddAsync("info with exception", LogEventLevel.Information, now, "boom");
+        await database.AddAsync("old error", LogVueLevel.Error, now.AddHours(-3), "boom");
+        await database.AddAsync("error with exception", LogVueLevel.Error, now, "boom");
+        await database.AddAsync("error without exception", LogVueLevel.Error, now);
+        await database.AddAsync("warning with exception", LogVueLevel.Warning, now, "boom");
+        await database.AddAsync("info with exception", LogVueLevel.Information, now, "boom");
 
         var result = await database.CreateLogEntryService().SearchAsync(new LogEntrySearchRequest
         {
             Filter = new LogFilter
             {
-                Levels = [LogEventLevel.Error, LogEventLevel.Warning],
+                Levels = [LogVueLevel.Error, LogVueLevel.Warning],
                 ExceptionsOnly = true,
                 FromUtc = now.AddHours(-1),
             },
@@ -128,9 +126,9 @@ public class LogEntryServiceTests : IDisposable
     [Fact]
     public async Task SearchAsync_LikeAndLevelFields()
     {
-        await database.AddAsync("orders", LogEventLevel.Error, properties: [("SourceContext", "Shop.Api.OrdersController")]);
-        await database.AddAsync("orders debug", LogEventLevel.Debug, properties: [("SourceContext", "Shop.Api.OrdersController")]);
-        await database.AddAsync("cart", LogEventLevel.Error, properties: [("SourceContext", "Shop.Api.CartController")]);
+        await database.AddAsync("orders", LogVueLevel.Error, properties: [("SourceContext", "Shop.Api.OrdersController")]);
+        await database.AddAsync("orders debug", LogVueLevel.Debug, properties: [("SourceContext", "Shop.Api.OrdersController")]);
+        await database.AddAsync("cart", LogVueLevel.Error, properties: [("SourceContext", "Shop.Api.CartController")]);
 
         var result = await Search("SourceContext like '%orders%' and level != debug");
 
@@ -149,20 +147,20 @@ public class LogEntryServiceTests : IDisposable
     [Fact]
     public async Task GetLevelCountsAsync_IgnoresTheLevelCriterionButAppliesTheRest()
     {
-        await database.AddAsync("a", LogEventLevel.Error, exception: "x");
-        await database.AddAsync("b", LogEventLevel.Error);
-        await database.AddAsync("c", LogEventLevel.Warning, exception: "x");
+        await database.AddAsync("a", LogVueLevel.Error, exception: "x");
+        await database.AddAsync("b", LogVueLevel.Error);
+        await database.AddAsync("c", LogVueLevel.Warning, exception: "x");
 
         var result = await database.CreateLogEntryService().GetLevelCountsAsync(new LogFilter
         {
-            Levels = [LogEventLevel.Fatal],
+            Levels = [LogVueLevel.Fatal],
             ExceptionsOnly = true,
         });
 
         Assert.Equal(6, result.Value.Count);
-        Assert.Equal(1, result.Value.Single(c => c.Level == LogEventLevel.Error).Count);
-        Assert.Equal(1, result.Value.Single(c => c.Level == LogEventLevel.Warning).Count);
-        Assert.Equal(0, result.Value.Single(c => c.Level == LogEventLevel.Fatal).Count);
+        Assert.Equal(1, result.Value.Single(c => c.Level == LogVueLevel.Error).Count);
+        Assert.Equal(1, result.Value.Single(c => c.Level == LogVueLevel.Warning).Count);
+        Assert.Equal(0, result.Value.Single(c => c.Level == LogVueLevel.Fatal).Count);
     }
 
     [Fact]

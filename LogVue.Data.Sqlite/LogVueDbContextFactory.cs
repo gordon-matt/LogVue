@@ -21,8 +21,7 @@ public class LogVueDbContextFactory(string connectionString) : ILogVueDbContextF
             .MigrationsAssembly(typeof(LogVueDbContext).Assembly.GetName().Name)
             .MigrationsHistoryTable(Constants.MigrationsHistoryTable));
 
-        // The sink writes through this context. If EF logged its own INSERTs, Serilog would hand
-        // them straight back to the sink.
+        // LogVue writes through this context. If EF logged its own INSERTs, they would be stored again.
         optionsBuilder.UseLoggerFactory(NullLoggerFactory.Instance);
 
         return optionsBuilder.Options;

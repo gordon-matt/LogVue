@@ -3,20 +3,15 @@ using LogVue.Data.MySql;
 using LogVue.Data.Npgsql;
 using LogVue.Data.Sql;
 using LogVue.Data.Sqlite;
+using LogVue.Providers;
 using LogVue.Sample;
-using Serilog;
-using Serilog.Events;
-using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// One switch for the whole pipeline, so the level picker on the dashboard governs every sink.
-var levelSwitch = new LoggingLevelSwitch(LogEventLevel.Debug);
 
 builder.Services.AddLogVue(options =>
 {
     builder.Configuration.GetSection(LogVueOptions.SectionName).Bind(options);
-    options.LevelSwitch = levelSwitch;
+    options.MinimumLevel = LogVueLevel.Debug;
 });
 
 string provider = builder.Configuration["Database:Provider"] ?? Constants.DatabaseProviders.Sqlite;
@@ -45,19 +40,10 @@ switch (provider)
             $"Unknown Database:Provider '{provider}'. Expected Sqlite, SqlServer, Npgsql or MySql.");
 }
 
-builder.Services.AddSerilog((services, configuration) => configuration
-    .MinimumLevel.ControlledBy(levelSwitch)
-    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.LogVue(services));
-
 builder.Services.AddHostedService<SampleTrafficGenerator>();
 
 var app = builder.Build();
 
-app.UseSerilogRequestLogging();
 app.UseStaticFiles();
 
 app.MapGet("/", () => Results.Redirect("/logvue"));

@@ -10,7 +10,7 @@ public record LogFilter
     public string? Query { get; init; }
 
     /// <summary>Empty means every level.</summary>
-    public IReadOnlyCollection<LogEventLevel> Levels { get; init; } = [];
+    public IReadOnlyCollection<LogVueLevel> Levels { get; init; } = [];
 
     public bool ExceptionsOnly { get; init; }
 
@@ -55,7 +55,7 @@ public record LogEntryPageDto(IReadOnlyList<LogEntryDto> Items, bool HasMore);
 public record LogEntryDto(
     long Id,
     DateTime Timestamp,
-    LogEventLevel Level,
+    LogVueLevel Level,
     string Message,
     string MessageTemplate,
     string? Exception,
@@ -67,7 +67,7 @@ public record LogEntryDto(
 
 public record LogPropertyDto(string Name, string? Value);
 
-public record LevelCountDto(LogEventLevel Level, long Count);
+public record LevelCountDto(LogVueLevel Level, long Count);
 
 public record LogStoreSummaryDto(long TotalCount, DateTime? OldestUtc, DateTime? NewestUtc, string ProviderName);
 

@@ -11,12 +11,12 @@ namespace LogVue.Components.Pages;
 
 public partial class Dashboard : IAsyncDisposable
 {
-    private static readonly LogEventLevel[] TileLevels =
+    private static readonly LogVueLevel[] TileLevels =
     [
-        LogEventLevel.Fatal,
-        LogEventLevel.Error,
-        LogEventLevel.Warning,
-        LogEventLevel.Information,
+        LogVueLevel.Fatal,
+        LogVueLevel.Error,
+        LogVueLevel.Warning,
+        LogVueLevel.Information,
     ];
 
     private DashboardFilter filter = new();
@@ -28,7 +28,7 @@ public partial class Dashboard : IAsyncDisposable
     private TimeDisplay time = TimeDisplay.Utc;
     private TimeDisplay browserTime = TimeDisplay.Utc;
     private bool showUtc;
-    private LogEventLevel minimumLevel;
+    private LogVueLevel minimumLevel;
     private CancellationTokenSource? loadCancellation;
     private DotNetObjectReference<Dashboard>? selfReference;
     private bool disposed;
@@ -241,24 +241,24 @@ public partial class Dashboard : IAsyncDisposable
         return "logs" + query;
     }
 
-    private string LevelHref(LogEventLevel level) =>
-        LogsHref(filter with { Levels = new HashSet<LogEventLevel> { level }, Query = null, ExceptionsOnly = false });
+    private string LevelHref(LogVueLevel level) =>
+        LogsHref(filter with { Levels = new HashSet<LogVueLevel> { level }, Query = null, ExceptionsOnly = false });
 
     private string ExceptionsHref() =>
-        LogsHref(filter with { Levels = new HashSet<LogEventLevel>(), Query = null, ExceptionsOnly = true });
+        LogsHref(filter with { Levels = new HashSet<LogVueLevel>(), Query = null, ExceptionsOnly = true });
 
     private string TemplateHref(string template) =>
         LogsHref(filter with
         {
             Query = LogQueryText.Condition("MessageTemplate", template),
-            Levels = new HashSet<LogEventLevel>(),
+            Levels = new HashSet<LogVueLevel>(),
             ExceptionsOnly = false,
         });
 
-    private long CountOf(LogEventLevel level) =>
+    private long CountOf(LogVueLevel level) =>
         insights?.Levels.FirstOrDefault(l => l.Level == level)?.Count ?? 0;
 
-    private long? PreviousCount(LogEventLevel level) =>
+    private long? PreviousCount(LogVueLevel level) =>
         insights?.PreviousLevels?.FirstOrDefault(l => l.Level == level)?.Count;
 
     private string BucketLabel(DateTime utc)
@@ -336,8 +336,8 @@ public partial class Dashboard : IAsyncDisposable
         return increased == increaseIsBad ? "lv-text-danger" : "lv-text-good";
     }
 
-    private static bool IncreaseIsBad(LogEventLevel level) =>
-        level is LogEventLevel.Fatal or LogEventLevel.Error or LogEventLevel.Warning;
+    private static bool IncreaseIsBad(LogVueLevel level) =>
+        level is LogVueLevel.Fatal or LogVueLevel.Error or LogVueLevel.Warning;
 
     [JSInvokable]
     public void OnShortcut(string key)

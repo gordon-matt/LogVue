@@ -11,10 +11,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\LogVue\LogVue.csproj" />
 		<ProjectReference Include="..\LogVue.Data.MySql\LogVue.Data.MySql.csproj" />
 		<ProjectReference Include="..\LogVue.Data.Npgsql\LogVue.Data.Npgsql.csproj" />

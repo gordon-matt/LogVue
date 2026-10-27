@@ -1,8 +1,11 @@
 <img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Logo.png" alt="Logo" width="300" />
 
-An in-process log dashboard for ASP.NET Core apps that use Serilog. LogVue is a Serilog sink plus
-a Blazor dashboard shipped as a Razor Class Library: add a few lines to `Program.cs` and your app
-stores its own logs and serves a page to search, tail and clean them up. No separate log server.
+An in-process log dashboard for ASP.NET Core. LogVue is a `Microsoft.Extensions.Logging` provider
+plus a Blazor dashboard shipped as a Razor Class Library: add a few lines to `Program.cs` and your
+app stores its own logs and serves a page to search, tail and clean them up. No separate log
+server. Anything written with `ILogger` is stored, including Serilog, NLog and log4net when they
+are registered as Microsoft logging providers. Apps that replace that pipeline and log only
+through Serilog use the optional `LogVue.Providers.Serilog` package.
 
 LogVue is a modernised take on [Sejil](https://github.com/alaatm/Sejil), with:
 
@@ -38,17 +41,11 @@ Then, in `Program.cs`:
 ```csharp
 using LogVue;
 using LogVue.Data.Sqlite;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLogVue(options => options.RetentionDays = 30);
 builder.Services.AddLogVueSqlite("Data Source=logs.db");
-
-builder.Services.AddSerilog((services, configuration) => configuration
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.LogVue(services));
 
 var app = builder.Build();
 
@@ -75,19 +72,37 @@ app.MapLogVue().RequireAuthorization("Admins");
 
 Set `ReadOnly = true` to let people browse without deleting entries or changing the level.
 
-### One level switch for everything
+### Serilog's own pipeline
 
-The dashboard's "Store events at or above" picker changes `LogVueOptions.LevelSwitch`. By default
-that only governs what LogVue stores. To let it govern every sink, share one switch:
+`AddSerilog()` replaces the Microsoft logger and does not forward events to other providers, so the
+provider above never sees them. Reference `LogVue.Providers.Serilog` and write Serilog to LogVue
+directly:
 
 ```csharp
+using LogVue;
+using LogVue.Data.Sqlite;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+
 var levelSwitch = new LoggingLevelSwitch(LogEventLevel.Information);
 
-builder.Services.AddLogVue(options => options.LevelSwitch = levelSwitch);
+builder.Services.AddLogVue(options => options.RetentionDays = 30);
+builder.Services.AddLogVueSqlite("Data Source=logs.db");
+builder.Services.AddLogVueSerilog(levelSwitch);
+
 builder.Services.AddSerilog((services, configuration) => configuration
     .MinimumLevel.ControlledBy(levelSwitch)
-    .WriteTo.LogVue(services));
+    .WriteTo.LogVue(services, levelSwitch));
 ```
+
+`AddLogVueSerilog` points the dashboard's level picker at that switch, so one control governs every
+Serilog sink. Call `WriteTo.LogVue(services)` without a switch when only the level LogVue stores
+should change.
+
+Leave `writeToProviders` off. Turning it on as well as `WriteTo.LogVue` stores each event twice.
+Set `UseLoggerProvider` to false if a host has to forward events to other Microsoft providers and
+still use the sink.
 
 ### Options
 
@@ -104,7 +119,8 @@ Bind them from configuration with
 | `RetentionDays`               | `0`        | Deletes entries older than this. `0` keeps everything. |
 | `RetentionInterval`           | 1 hour     | How often retention runs. |
 | `AutoMigrate`                 | `true`     | Applies migrations at startup. Turn off if schema changes go through your pipeline. |
-| `LevelSwitch`                 | Information | The switch the level picker controls. |
+| `MinimumLevel`                | Information | Lowest level stored at startup. The picker changes it afterwards. |
+| `UseLoggerProvider`           | `true`     | Stores `ILogger` calls. Turn off when the Serilog sink is already capturing them. |
 | `IgnoreDashboardRequests`     | `true`     | Skips events raised while serving the dashboard itself. |
 | `PageSize`                    | `100`      | Entries fetched per scroll step. |
 | `LiveRefreshInterval`         | 3 seconds  | Polling interval while live tail is on. |
@@ -168,7 +184,9 @@ served from the mount path.
 | Project                 | Contents |
 |-------------------------|----------|
 | `LogVue`                | The Razor Class Library: `AddLogVue`, `MapLogVue` and the Blazor dashboard. |
-| `LogVue.Services`       | The Serilog sink, the query language, and services returning `Ardalis.Result`. |
+| `LogVue.Providers.Abstractions` | The level, the event, and the writer and level-gate contracts a provider builds on. |
+| `LogVue.Providers.Serilog` | The Serilog sink. Referenced only by hosts that log through Serilog's own pipeline. |
+| `LogVue.Services`       | The `ILogger` provider, ingestion, the query language, and services returning `Ardalis.Result`. |
 | `LogVue.Data`           | Entities, the base `DbContext` and the provider abstractions. |
 | `LogVue.Data.*`         | One project per database, with its context factory and migrations. |
 | `LogVue.Sample`         | A demo app that generates traffic. `dotnet run --project LogVue.Sample`, then open http://localhost:5180/logvue. |

@@ -7,7 +7,6 @@ using LogVue.Services.SavedQueries;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-using Serilog.Events;
 
 namespace LogVue.Tests;
 
@@ -85,7 +84,7 @@ public sealed class TestDatabase : IDisposable
 
     public async Task<LogEntry> AddAsync(
         string message,
-        LogEventLevel level = LogEventLevel.Information,
+        LogVueLevel level = LogVueLevel.Information,
         DateTime? timestamp = null,
         string? exception = null,
         params (string Name, string? Value)[] properties)

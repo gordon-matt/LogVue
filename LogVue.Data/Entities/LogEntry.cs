@@ -1,7 +1,7 @@
 namespace LogVue.Data.Entities;
 
 /// <summary>
-/// One Serilog event. The identity key doubles as the paging cursor: it only ever grows, so
+/// One stored event. The identity key doubles as the paging cursor: it only ever grows, so
 /// "older than id N" is an index seek where Sejil's OFFSET paging re-read every skipped row.
 /// </summary>
 public class LogEntry : BaseEntity<long>
@@ -10,7 +10,7 @@ public class LogEntry : BaseEntity<long>
     public DateTime Timestamp { get; set; }
 
     /// <summary>Stored as an integer, so level filters compare numbers rather than strings.</summary>
-    public LogEventLevel Level { get; set; }
+    public LogVueLevel Level { get; set; }
 
     /// <summary>The message with its template rendered, as it would read in a text log.</summary>
     public string Message { get; set; } = string.Empty;

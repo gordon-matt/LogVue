@@ -21,7 +21,7 @@
                             Levels
                             @if (filter.Levels.Count > 0)
                             {
-                                <button type="button" class="lv-link-button" @onclick="() => ApplyFilterAsync(filter with { Levels = new HashSet<LogEventLevel>() })">
+                                <button type="button" class="lv-link-button" @onclick="() => ApplyFilterAsync(filter with { Levels = new HashSet<LogVueLevel>() })">
                                     Show all
                                 </button>
                             }
@@ -257,7 +257,7 @@
     private LogStoreSummaryDto? summary;
     private IReadOnlyList<SavedQueryDto>? savedQueries;
     private LogEntryDto? selected;
-    private LogEventLevel minimumLevel;
+    private LogVueLevel minimumLevel;
 
     private TimeDisplay time = TimeDisplay.Utc;
     private TimeDisplay browserTime = TimeDisplay.Utc;
@@ -764,7 +764,7 @@
 
     private void SetMinimumLevel(ChangeEventArgs e)
     {
-        if (!Enum.TryParse<LogEventLevel>(e.Value?.ToString(), out var level))
+        if (!Enum.TryParse<LogVueLevel>(e.Value?.ToString(), out var level))
         {
             return;
         }

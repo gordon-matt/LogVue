@@ -20,7 +20,7 @@ public sealed record DashboardFilter
     public string? Query { get; init; }
 
     /// <summary>Empty means every level.</summary>
-    public IReadOnlySet<LogEventLevel> Levels { get; init; } = new HashSet<LogEventLevel>();
+    public IReadOnlySet<LogVueLevel> Levels { get; init; } = new HashSet<LogVueLevel>();
 
     public bool ExceptionsOnly { get; init; }
 
@@ -35,9 +35,9 @@ public sealed record DashboardFilter
     public bool HasCriteria =>
         !string.IsNullOrWhiteSpace(Query) || Levels.Count > 0 || ExceptionsOnly || Range != TimeRange.All;
 
-    public DashboardFilter ToggleLevel(LogEventLevel level)
+    public DashboardFilter ToggleLevel(LogVueLevel level)
     {
-        var levels = new HashSet<LogEventLevel>(Levels);
+        var levels = new HashSet<LogVueLevel>(Levels);
 
         if (!levels.Remove(level))
         {
@@ -83,7 +83,7 @@ public sealed record DashboardFilter
             return query.TryGetValue(key, out var values) ? values.ToString() : null;
         }
 
-        var levels = new HashSet<LogEventLevel>();
+        var levels = new HashSet<LogVueLevel>();
         foreach (string part in (Get(LevelsKey) ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
             if (LogLevels.TryParse(part, out var level))

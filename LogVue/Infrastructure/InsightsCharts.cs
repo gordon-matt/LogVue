@@ -116,7 +116,7 @@ internal static class InsightsCharts
         };
     }
 
-    private static long Count(LogVolumePointDto point, LogEventLevel level) =>
+    private static long Count(LogVolumePointDto point, LogVueLevel level) =>
         point.Levels.FirstOrDefault(l => l.Level == level)?.Count ?? 0;
 
     private static string Shorten(string value)
@@ -125,14 +125,14 @@ internal static class InsightsCharts
         return singleLine.Length <= 48 ? singleLine : singleLine[..47] + "…";
     }
 
-    private static string Color(LogEventLevel level) => level switch
+    private static string Color(LogVueLevel level) => level switch
     {
-        LogEventLevel.Verbose => "#94a3b8",
-        LogEventLevel.Debug => "#64748b",
-        LogEventLevel.Information => "#2563eb",
-        LogEventLevel.Warning => "#d97706",
-        LogEventLevel.Error => "#dc2626",
-        LogEventLevel.Fatal => "#a21caf",
+        LogVueLevel.Verbose => "#94a3b8",
+        LogVueLevel.Debug => "#64748b",
+        LogVueLevel.Information => "#2563eb",
+        LogVueLevel.Warning => "#d97706",
+        LogVueLevel.Error => "#dc2626",
+        LogVueLevel.Fatal => "#a21caf",
         _ => "#6b7380",
     };
 }

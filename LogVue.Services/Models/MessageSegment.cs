@@ -1,5 +1,3 @@
-using Serilog.Parsing;
-
 namespace LogVue.Models;
 
 public enum MessageSegmentKind
@@ -16,8 +14,6 @@ public enum MessageSegmentKind
 /// </summary>
 public sealed record MessageSegment(string Text, MessageSegmentKind Kind, string? PropertyName = null)
 {
-    private static readonly MessageTemplateParser TemplateParser = new();
-
     public static IReadOnlyList<MessageSegment> Parse(
         string template,
         IReadOnlyList<LogPropertyDto> properties,
@@ -36,23 +32,27 @@ public sealed record MessageSegment(string Text, MessageSegmentKind Kind, string
 
         var segments = new List<MessageSegment>();
 
-        foreach (var token in TemplateParser.Parse(template).Tokens)
+        foreach (var token in MessageTemplate.Tokenize(template))
         {
-            switch (token)
+            if (!token.IsProperty)
             {
-                case TextToken text when text.Text.Length > 0:
-                    segments.Add(new MessageSegment(text.Text, MessageSegmentKind.Text));
-                    break;
+                if (token.Text.Length > 0)
+                {
+                    segments.Add(new MessageSegment(token.Text, MessageSegmentKind.Text));
+                }
 
-                case PropertyToken property when values.TryGetValue(property.PropertyName, out string? value)
-                                                 && !string.IsNullOrEmpty(value):
-                    segments.Add(new MessageSegment(ApplyFormat(value, property.Format), Classify(value), property.PropertyName));
-                    break;
-
-                case PropertyToken property:
-                    segments.Add(new MessageSegment(property.ToString(), MessageSegmentKind.Text));
-                    break;
+                continue;
             }
+
+            if (token.Name is not null
+                && values.TryGetValue(token.Name, out string? value)
+                && !string.IsNullOrEmpty(value))
+            {
+                segments.Add(new MessageSegment(ApplyFormat(value, token.Format), Classify(value), token.Name));
+                continue;
+            }
+
+            segments.Add(new MessageSegment(token.Text, MessageSegmentKind.Text));
         }
 
         return segments;

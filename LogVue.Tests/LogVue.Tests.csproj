@@ -23,6 +23,7 @@
 
 	<ItemGroup>
 		<Using Include="Xunit" />
+		<Using Include="LogVue.Providers" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -31,6 +32,7 @@
 		<ProjectReference Include="..\LogVue.Data.Npgsql\LogVue.Data.Npgsql.csproj" />
 		<ProjectReference Include="..\LogVue.Data.Sql\LogVue.Data.Sql.csproj" />
 		<ProjectReference Include="..\LogVue.Data.Sqlite\LogVue.Data.Sqlite.csproj" />
+		<ProjectReference Include="..\LogVue.Providers.Serilog\LogVue.Providers.Serilog.csproj" />
 		<ProjectReference Include="..\LogVue.Services\LogVue.Services.csproj" />
 	</ItemGroup>
 

@@ -1,23 +1,23 @@
 namespace LogVue.Services.Settings;
 
 /// <summary>
-/// The minimum level LogVue stores, backed by <see cref="LogVueOptions.LevelSwitch"/> so a change
-/// applies to the very next event without a restart.
+/// The minimum level LogVue stores. A change applies to the next event without a restart.
 /// </summary>
 public interface IMinimumLevelService
 {
-    LogEventLevel Current { get; }
+    LogVueLevel Current { get; }
 
-    Result Set(LogEventLevel level);
+    Result Set(LogVueLevel level);
 }
 
 public sealed class MinimumLevelService(
     ILogger<MinimumLevelService> logger,
-    IOptions<LogVueOptions> options) : IMinimumLevelService
+    IOptions<LogVueOptions> options,
+    ILogLevelGate levels) : IMinimumLevelService
 {
-    public LogEventLevel Current => options.Value.LevelSwitch.MinimumLevel;
+    public LogVueLevel Current => levels.Current;
 
-    public Result Set(LogEventLevel level)
+    public Result Set(LogVueLevel level)
     {
         if (options.Value.ReadOnly)
         {
@@ -29,8 +29,8 @@ public sealed class MinimumLevelService(
             return Result.Invalid(new ValidationError(nameof(level), $"'{level}' is not a log level."));
         }
 
-        var previous = options.Value.LevelSwitch.MinimumLevel;
-        options.Value.LevelSwitch.MinimumLevel = level;
+        var previous = levels.Current;
+        levels.Set(level);
 
         logger.LogInformation("LogVue minimum level changed from {Previous} to {Current}", previous, level);
 

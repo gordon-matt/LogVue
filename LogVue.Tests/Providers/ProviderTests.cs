@@ -3,8 +3,6 @@ using LogVue.Data;
 using LogVue.Data.Npgsql;
 using LogVue.Models;
 using LogVue.Services;
-using Serilog.Events;
-
 namespace LogVue.Tests.Providers;
 
 /// <summary>
@@ -57,13 +55,13 @@ public class ProviderTests
         var service = database.CreateLogEntryService();
         var now = DateTime.UtcNow;
 
-        await database.AddAsync("old", LogEventLevel.Warning, now.AddDays(-40));
-        await database.AddAsync("Order 1 placed", LogEventLevel.Information, now.AddMinutes(-3), null,
+        await database.AddAsync("old", LogVueLevel.Warning, now.AddDays(-40));
+        await database.AddAsync("Order 1 placed", LogVueLevel.Information, now.AddMinutes(-3), null,
             ("Customer", "Contoso"), ("SourceContext", "Shop.Api.OrdersController"));
-        var payment = await database.AddAsync("Payment TIMEOUT", LogEventLevel.Error, now.AddMinutes(-2), "System.TimeoutException: gateway",
+        var payment = await database.AddAsync("Payment TIMEOUT", LogVueLevel.Error, now.AddMinutes(-2), "System.TimeoutException: gateway",
             ("Customer", "Fabrikam"));
-        await database.AddAsync("Progress 100% done", LogEventLevel.Debug, now.AddMinutes(-1));
-        await database.AddAsync("Progress 1000 done", LogEventLevel.Debug, now);
+        await database.AddAsync("Progress 100% done", LogVueLevel.Debug, now.AddMinutes(-1));
+        await database.AddAsync("Progress 1000 done", LogVueLevel.Debug, now);
 
         async Task<string[]> Search(string? query = null, LogFilter? filter = null)
         {
@@ -108,14 +106,14 @@ public class ProviderTests
         Assert.Equal(["Payment TIMEOUT"], await Search(filter: new LogFilter { ExceptionsOnly = true }));
         Assert.Equal(["Progress 1000 done", "Progress 100% done"], await Search(filter: new LogFilter
         {
-            Levels = [LogEventLevel.Debug],
+            Levels = [LogVueLevel.Debug],
             FromUtc = now.AddHours(-1),
         }));
 
         var counts = await service.GetLevelCountsAsync(new LogFilter { FromUtc = now.AddHours(-1) });
-        Assert.Equal(2, counts.Value.Single(c => c.Level == LogEventLevel.Debug).Count);
-        Assert.Equal(1, counts.Value.Single(c => c.Level == LogEventLevel.Error).Count);
-        Assert.Equal(0, counts.Value.Single(c => c.Level == LogEventLevel.Warning).Count);
+        Assert.Equal(2, counts.Value.Single(c => c.Level == LogVueLevel.Debug).Count);
+        Assert.Equal(1, counts.Value.Single(c => c.Level == LogVueLevel.Error).Count);
+        Assert.Equal(0, counts.Value.Single(c => c.Level == LogVueLevel.Warning).Count);
 
         var summary = (await service.GetSummaryAsync()).Value;
         Assert.Equal(5, summary.TotalCount);
@@ -124,7 +122,7 @@ public class ProviderTests
         var insights = await service.GetInsightsAsync(new LogFilter { FromUtc = now.AddHours(-1), ToUtc = now.AddMinutes(1) });
         Assert.True(insights.IsSuccess, insights.GetDisplayMessage());
         Assert.Equal(1, insights.Value.ExceptionCount);
-        Assert.Equal(1, insights.Value.Levels.Single(c => c.Level == LogEventLevel.Error).Count);
+        Assert.Equal(1, insights.Value.Levels.Single(c => c.Level == LogVueLevel.Error).Count);
         Assert.Contains(insights.Value.TopSources, s => s.Name == "Shop.Api.OrdersController");
         Assert.NotEmpty(insights.Value.Volume);
 
