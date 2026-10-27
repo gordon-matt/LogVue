@@ -1,4 +1,3 @@
-using LogVue.Providers;
 using LogVue.Services.Hosting;
 using Microsoft.Extensions.Hosting;
 

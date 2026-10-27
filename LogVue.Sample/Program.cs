@@ -8,6 +8,9 @@ using LogVue.Sample;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Before AddLogVue: ClearProviders would otherwise remove LogVue's provider too.
+string loggingProvider = SampleLogging.Add(builder);
+
 builder.Services.AddLogVue(options =>
 {
     builder.Configuration.GetSection(LogVueOptions.SectionName).Bind(options);
@@ -40,10 +43,12 @@ switch (provider)
             $"Unknown Database:Provider '{provider}'. Expected Sqlite, SqlServer, Npgsql or MySql.");
 }
 
+SampleLogging.AddSerilogSink(builder, loggingProvider);
 builder.Services.AddHostedService<SampleTrafficGenerator>();
 
 var app = builder.Build();
 
+app.Logger.LogInformation("Logging provider is {LoggingProvider}", loggingProvider);
 app.UseStaticFiles();
 
 app.MapGet("/", () => Results.Redirect("/logvue"));

@@ -1,4 +1,5 @@
 using LogVue.Infrastructure;
+
 namespace LogVue.Tests.Infrastructure;
 
 public class DashboardFilterTests

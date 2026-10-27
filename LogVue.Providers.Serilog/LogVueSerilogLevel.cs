@@ -1,4 +1,3 @@
-using LogVue.Providers;
 using Serilog.Events;
 
 namespace LogVue.Providers.Serilog;

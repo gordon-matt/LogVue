@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Description>An in-process Blazor dashboard for viewing, querying and deleting an ASP.NET Core application's logs.</Description>
-		<Version>1.0.1</Version>
+		<Version>1.1.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using LogVue.Models;
+
 namespace LogVue.Tests.Services;
 
 public class LogEntryServiceTests : IDisposable

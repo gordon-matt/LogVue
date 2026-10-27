@@ -1,5 +1,3 @@
-using LogVue.Providers;
-
 namespace LogVue;
 
 public sealed class LogVueOptions

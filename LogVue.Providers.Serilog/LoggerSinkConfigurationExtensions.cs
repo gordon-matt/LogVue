@@ -3,7 +3,6 @@ using LogVue.Providers.Serilog;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Configuration;
 using Serilog.Core;
-using Serilog.Events;
 
 // In Serilog's namespace, as sinks conventionally are, so `using Serilog;` is all a host needs.
 namespace Serilog;

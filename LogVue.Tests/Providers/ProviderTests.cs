@@ -3,6 +3,7 @@ using LogVue.Data;
 using LogVue.Data.Npgsql;
 using LogVue.Models;
 using LogVue.Services;
+
 namespace LogVue.Tests.Providers;
 
 /// <summary>

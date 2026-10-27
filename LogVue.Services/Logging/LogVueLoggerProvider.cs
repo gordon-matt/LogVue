@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using LogVue.Providers;
 
 namespace LogVue.Services.Logging;
 

@@ -192,6 +192,11 @@ served from the mount path.
 | `LogVue.Sample`         | A demo app that generates traffic. `dotnet run --project LogVue.Sample`, then open http://localhost:5180/logvue. |
 | `LogVue.Tests`          | xUnit tests. |
 
+The sample writes its traffic with `ILogger`. Set `Sample:LoggingProvider` in `LogVue.Sample/appsettings.json`
+to `Microsoft`, `NLog`, `Log4Net` or `Serilog`. NLog and log4net are registered as Microsoft logging
+providers, so LogVue stores the same events. Serilog replaces that pipeline, and the sample sends it
+to LogVue with `WriteTo.LogVue`.
+
 Data access goes through [Extenso](https://github.com/gordon-matt/Extenso)'s
 `EntityFrameworkRepository<T>`.
 

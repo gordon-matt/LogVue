@@ -1,11 +1,9 @@
-using LogVue.Providers;
 using LogVue.Services.Hosting;
 using LogVue.Services.LogEntries;
 using LogVue.Services.Logging;
 using LogVue.Services.SavedQueries;
 using LogVue.Services.Settings;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 
 namespace LogVue.Services;
 

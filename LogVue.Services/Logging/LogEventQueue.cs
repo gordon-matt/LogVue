@@ -1,5 +1,4 @@
 using System.Threading.Channels;
-using LogVue.Providers;
 
 namespace LogVue.Services.Logging;
 

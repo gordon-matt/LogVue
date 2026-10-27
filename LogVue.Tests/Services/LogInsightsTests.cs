@@ -1,6 +1,6 @@
 using LogVue.Models;
 using LogVue.Services;
-using LogVue.Services.LogEntries;
+
 namespace LogVue.Tests.Services;
 
 public class LogInsightsTests : IDisposable
