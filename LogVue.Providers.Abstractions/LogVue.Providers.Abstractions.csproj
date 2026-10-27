@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Description>Contracts for writing events into the LogVue log dashboard. A provider package references this and nothing else from LogVue.</Description>
-		<Version>1.1.0</Version>
+		<Version>1.1.1</Version>
 		<RootNamespace>LogVue.Providers</RootNamespace>
 	</PropertyGroup>
 
