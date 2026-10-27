@@ -1,0 +1,35 @@
+---
+description: Which of my other projects this repo depends on and where their source lives. Read before using or investigating any internal library/package.
+alwaysApply: false
+---
+
+Shared coding conventions live in Blueprint/.cursor/rules/conventions.mdc (absolute path: D:\Source\GitHub\Blueprint\.cursor\rules\conventions.mdc). Read it before writing or changing code.
+
+@../../Blueprint/.cursor/rules/conventions.mdc
+
+## Internal dependencies
+
+| Name | How it's consumed | Package ID and version | Source location |
+| --- | --- | --- | --- |
+| Extenso.Data.Entity | NuGet PackageReference | Extenso.Data.Entity 10.2.0 | `D:\Source\GitHub\Libraries\Extenso` (`..\..\Libraries\Extenso`) |
+| Heroicsoft.NetForge.Components | NuGet PackageReference | Heroicsoft.NetForge.Components 1.1.1 | `D:\Source\GitHub\Libraries\Heroicsoft.NetForge` (`..\..\Libraries\Heroicsoft.NetForge`) |
+
+## Unresolved
+
+None.
+
+## Reverse dependencies
+
+- `Components\WebFilez` - LogVue 1.0.1 (NuGet PackageReference); LogVue.Data.Sqlite 1.0.1 (NuGet PackageReference)
+- `SelfHosted\ArcaFS` - LogVue commented-out package 1.0.0 (ProjectReference); LogVue.Data.MySql 1.0.0 (NuGet PackageReference); LogVue.Data.Npgsql 1.0.0 (NuGet PackageReference); LogVue.Data.Sql 1.0.0 (NuGet PackageReference); LogVue.Data.Sqlite 1.0.0 (NuGet PackageReference)
+- `SelfHosted\Kabinet` - LogVue 1.1.1 (NuGet PackageReference); LogVue.Data.MySql 1.1.1 (NuGet PackageReference); LogVue.Data.Npgsql 1.1.1 (NuGet PackageReference); LogVue.Data.Sql 1.1.1 (NuGet PackageReference); LogVue.Data.Sqlite 1.1.1 (NuGet PackageReference); LogVue.Providers.Serilog 1.1.1 (NuGet PackageReference)
+- `SelfHosted\Kinnect` - LogVue commented-out package 1.0.1 (ProjectReference); LogVue.Data.MySql 1.0.1 (NuGet PackageReference); LogVue.Data.Npgsql 1.0.1 (NuGet PackageReference); LogVue.Data.Sql 1.0.1 (NuGet PackageReference); LogVue.Data.Sqlite 1.0.1 (NuGet PackageReference)
+- `SelfHosted\LinkStash` - LogVue 1.1.1 (NuGet PackageReference); LogVue.Data.Npgsql 1.0.0 (NuGet PackageReference); LogVue.Providers.Serilog 1.1.1 (NuGet PackageReference)
+- `SelfHosted\MoneyLens` - LogVue 1.1.1 (NuGet PackageReference); LogVue.Data.Npgsql 1.1.1 (NuGet PackageReference); LogVue.Providers.Serilog 1.1.1 (NuGet PackageReference)
+- `SelfHosted\MyVideoArchive` - LogVue commented-out package 1.0.0 (ProjectReference); LogVue.Data.MySql 1.0.0 (NuGet PackageReference); LogVue.Data.Npgsql 1.0.0 (NuGet PackageReference); LogVue.Data.Sql 1.0.0 (NuGet PackageReference); LogVue.Data.Sqlite 1.0.0 (NuGet PackageReference)
+- `SelfHosted\PicStashly` - LogVue 1.1.1 (NuGet PackageReference); LogVue.Data.MySql 1.0.0 (NuGet PackageReference); LogVue.Data.Npgsql 1.0.0 (NuGet PackageReference); LogVue.Data.Sql 1.0.0 (NuGet PackageReference); LogVue.Data.Sqlite 1.0.0 (NuGet PackageReference); LogVue.Providers.Serilog 1.1.1 (NuGet PackageReference)
+- `SelfHosted\ReelSoon` - LogVue 1.1.1 (NuGet PackageReference); LogVue.Data.MySql 1.0.0 (NuGet PackageReference); LogVue.Data.Npgsql 1.0.0 (NuGet PackageReference); LogVue.Data.Sql 1.0.0 (NuGet PackageReference); LogVue.Data.Sqlite 1.0.0 (NuGet PackageReference); LogVue.Providers.Serilog 1.1.1 (NuGet PackageReference)
+- `SelfHosted\Shelfwarden` - LogVue commented-out package 1.0.0 (ProjectReference); LogVue.Data.MySql 1.0.0 (NuGet PackageReference); LogVue.Data.Npgsql 1.0.0 (NuGet PackageReference); LogVue.Data.Sql 1.0.0 (NuGet PackageReference); LogVue.Data.Sqlite 1.0.0 (NuGet PackageReference)
+- `SelfHosted\Snippetz` - LogVue 1.1.1 (NuGet PackageReference); LogVue.Data.MySql 1.0.0 (NuGet PackageReference); LogVue.Data.Npgsql 1.0.0 (NuGet PackageReference); LogVue.Data.Sql 1.0.0 (NuGet PackageReference); LogVue.Data.Sqlite 1.0.0 (NuGet PackageReference); LogVue.Providers.Serilog 1.1.1 (NuGet PackageReference)
+
+When you need to understand an API, behavior, or bug in one of the internal packages above, read its source code at the listed location. Do NOT use reflection, decompilation, or inspect DLLs/NuGet cache. If a fix belongs in the library, say so rather than working around it in the consumer. Note that the consumer references a published package version, so local source may be newer than what the consumer actually uses; check the version.
