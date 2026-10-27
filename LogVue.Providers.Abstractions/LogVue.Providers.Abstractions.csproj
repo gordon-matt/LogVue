@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Contracts for writing events into the LogVue log dashboard. A provider package references this and nothing else from LogVue.</Description>
+		<Version>1.0.1</Version>
+		<RootNamespace>LogVue.Providers</RootNamespace>
+	</PropertyGroup>
+
+</Project>
