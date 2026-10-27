@@ -1,6 +1,6 @@
 namespace LogVue.Services.LogEntries;
 
-public sealed class LogEntryService(
+public sealed partial class LogEntryService(
     ILogger<LogEntryService> logger,
     IOptions<LogVueOptions> options,
     ILogVueQueryDialect dialect,

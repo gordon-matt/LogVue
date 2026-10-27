@@ -70,3 +70,26 @@ public record LogPropertyDto(string Name, string? Value);
 public record LevelCountDto(LogEventLevel Level, long Count);
 
 public record LogStoreSummaryDto(long TotalCount, DateTime? OldestUtc, DateTime? NewestUtc, string ProviderName);
+
+/// <summary>
+/// One window of the log store, shaped for the overview. <see cref="PreviousLevels"/> is the same
+/// length of time immediately before <see cref="FromUtc"/>, so a tile can say whether errors are
+/// rising. It is null for an open-ended window, which has no "previous" to compare with.
+/// </summary>
+public sealed record LogInsightsDto(
+    DateTime FromUtc,
+    DateTime ToUtc,
+    TimeSpan Bucket,
+    IReadOnlyList<LevelCountDto> Levels,
+    IReadOnlyList<LevelCountDto>? PreviousLevels,
+    long ExceptionCount,
+    long? PreviousExceptionCount,
+    IReadOnlyList<LogVolumePointDto> Volume,
+    IReadOnlyList<LogNameCountDto> TopSources,
+    IReadOnlyList<LogNameCountDto> TopTemplates);
+
+/// <summary>Counts per level for one bucket. Levels with no events are present and zero.</summary>
+public sealed record LogVolumePointDto(DateTime BucketUtc, IReadOnlyList<LevelCountDto> Levels);
+
+/// <summary>A source, template, or other name, with how often it occurred.</summary>
+public sealed record LogNameCountDto(string Name, long Count);

@@ -6,7 +6,7 @@ stores its own logs and serves a page to search, tail and clean them up. No sepa
 
 LogVue is a modernised take on [Sejil](https://github.com/alaatm/Sejil), with:
 
-- **A Blazor UI**: virtualised list, live tail, level counts, a details panel with click-to-filter
+- **A Blazor UI**: an overview with level totals, volume and the noisiest sources, plus a virtualised log search with live tail, level counts, a details panel with click-to-filter
   properties, saved queries, light and dark themes, local or UTC times, and keyboard navigation
   (`/` to search, `j`/`k` to move, `Esc` to close).
 - **Deletes**: a single entry, everything matching the current view, everything older than N
@@ -57,7 +57,7 @@ app.MapLogVue().RequireAuthorization();
 app.Run();
 ```
 
-Browse to `/logvue`. LogVue applies its migrations at startup, so the tables appear on first run.
+Browse to `/logvue` for the overview, or `/logvue/logs` to search. LogVue applies its migrations at startup, so the tables appear on first run.
 Its tables are prefixed `LogVue_`, and it keeps its own migrations history table, so it can share
 a database with your app.
 

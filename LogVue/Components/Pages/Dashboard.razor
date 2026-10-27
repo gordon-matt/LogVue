@@ -1,53 +1,13 @@
 @page "/"
 @implements IAsyncDisposable
-@inject ILogEntryService LogEntries
-@inject ISavedQueryService SavedQueries
-@inject IMinimumLevelService MinimumLevel
-@inject IOptions<LogVueOptions> Options
-@inject NavigationManager Navigation
-@inject ToastService Toasts
-@inject TimeProvider TimeProvider
-@inject IJSRuntime JS
 
 <AppShell ShowSearch="false" ShowThemePicker="false" ShowUserMenu="false" ShowVersion="false" CollapsibleSidebar="false">
     <Sidebar>
-        <nav class="nf-sidebar" id="nf-sidebar" aria-label="Filters">
-            <div class="nf-sidebar-brand">
-                <a class="nf-brand-link" href="./" aria-label="@Settings.Title" @onclick="ResetAsync" @onclick:preventDefault="true">
-                    @if (Branding.CustomLogoUrl(Settings) is { } logo)
-                    {
-                        <img class="nf-brand-logo" src="@logo" alt="" />
-                    }
-                    else if (Branding.HasCustomTitle(Settings))
-                    {
-                        <span class="nf-brand-text">@Settings.Title</span>
-                    }
-                    else
-                    {
-                        <img class="nf-brand-logo" src="@EmbeddedAssets.Url("Logo.png")" alt="" width="114" height="34" />
-                    }
-                </a>
-            </div>
+        <nav class="nf-sidebar" id="nf-sidebar" aria-label="Overview">
+            <BrandLink />
             <div class="nf-sidebar-scroll">
-                <div class="lv-filters">
-                    <section>
-                        <h3 class="lv-sidebar-heading">
-                            Levels
-                            @if (filter.Levels.Count > 0)
-                            {
-                                <button type="button" class="lv-link-button" @onclick="() => ApplyFilterAsync(filter with { Levels = new HashSet<LogEventLevel>() })">
-                                    Show all
-                                </button>
-                            }
-                        </h3>
-                        <LevelFilter Filter="filter" Counts="levelCounts" OnChange="ApplyFilterAsync" />
-                    </section>
-                    <section>
-                        <h3 class="lv-sidebar-heading">Saved queries</h3>
-                        <SavedQueryList Queries="savedQueries" ActiveQuery="@filter.Query" ReadOnly="Settings.ReadOnly"
-                                        OnApply="q => ApplyQueryAsync(q.Query)" OnDelete="DeleteSavedQueryAsync" />
-                    </section>
-                </div>
+                <SectionNav />
+                <p class="lv-muted lv-small">Tiles and charts follow the range in the header. Open a tile to search that slice.</p>
             </div>
             <div class="nf-sidebar-footer">
                 <h3 class="lv-sidebar-heading">Log store</h3>
@@ -60,47 +20,17 @@
                     <dd title="@(summary?.OldestUtc is DateTime oldest ? time.FormatLong(oldest) : null)">
                         @(summary?.OldestUtc is DateTime o ? TimeDisplay.Relative(o, UtcNow) : "–")
                     </dd>
-                    @if (Settings.RetentionDays > 0)
-                    {
-                        <dt>Retention</dt>
-                        <dd>@Settings.RetentionDays days</dd>
-                    }
                 </dl>
-                <label class="lv-field">
-                    <span>Store events at or above</span>
-                    <select class="lv-input" disabled="@Settings.ReadOnly" value="@minimumLevel" @onchange="SetMinimumLevel">
-                        @foreach (var level in LogLevels.All.Reverse())
-                        {
-                            <option value="@level">@level</option>
-                        }
-                    </select>
-                </label>
-                @if (Settings.ReadOnly)
-                {
-                    <p class="lv-muted lv-small">The dashboard is read-only.</p>
-                }
-                else
-                {
-                    <button type="button" class="lv-button lv-button-block" @onclick="OpenCleanupAsync">
-                        <Icon Name="trash" /> Delete entries…
-                    </button>
-                }
+                <p class="lv-muted lv-small">Storing @minimumLevel and above.</p>
+                <a class="lv-button lv-button-block" href="@LogsHref(filter)">
+                    <Icon Name="search" /> Search the logs
+                </a>
             </div>
         </nav>
     </Sidebar>
-    <TopbarCenter>
-        <SearchBox Query="@filter.Query" Error="@queryError" CanSave="@(!Settings.ReadOnly)"
-                   OnSearch="ApplyQueryAsync" OnSave="SaveQueryAsync" />
-    </TopbarCenter>
     <TopbarEnd>
         <div class="lv-topbar-actions">
-            <TimeRangePicker Filter="filter" Time="time" OnChange="ApplyFilterAsync" />
-            <button type="button" class="lv-button lv-live-button @(isLive ? "is-live" : null)" aria-pressed="@isLive"
-                    title="@(isLive ? "Stop following new entries" : $"Follow new entries every {Settings.LiveRefreshInterval.TotalSeconds:0.#}s")"
-                    @onclick="ToggleLive">
-                <span class="lv-live-dot"></span>
-                <span>Live</span>
-            </button>
+            <TimeRangePicker Filter="filter" Time="time" OnChange="ApplyFilter" />
             <button type="button" class="lv-icon-button" title="Refresh" disabled="@isLoading" @onclick="RefreshAsync">
                 <Icon Name="refresh" Class="@(isLoading ? "lv-spin" : null)" />
             </button>
@@ -113,748 +43,123 @@
         </div>
     </TopbarEnd>
     <ChildContent>
-    <div class="lv-page @(selected is null ? null : "lv-details-open")">
-    <main class="lv-main">
-        <div class="lv-results-bar">
-            <span class="lv-results-count">
-                @if (MatchingCount is long matching)
-                {
-                    <strong>@matching.ToString("N0", CultureInfo.CurrentCulture)</strong>
-                    @(matching == 1 ? " entry" : " entries")
-                    @if (entries is { Count: > 0 } && entries.Count < matching)
+        <div class="lv-dashboard">
+            <header class="lv-dash-head">
+                <div>
+                    <h1>Overview</h1>
+                    <p class="lv-muted">@WindowCaption</p>
+                </div>
+            </header>
+
+            @if (insights is null && loadError is null)
+            {
+                <div class="lv-stats" aria-hidden="true">
+                    @for (int i = 0; i < 6; i++)
                     {
-                        <span class="lv-muted"> · @entries.Count.ToString("N0", CultureInfo.CurrentCulture) loaded</span>
+                        <div class="lv-stat lv-stat-skeleton"></div>
                     }
-                }
-            </span>
-            @if (filter.HasCriteria)
-            {
-                <button type="button" class="lv-link-button" @onclick="ResetAsync">Clear filters</button>
+                </div>
             }
-            @if (isLive)
+            else if (loadError is not null)
             {
-                <span class="lv-live-status"><span class="lv-live-dot"></span> Following</span>
+                <div class="lv-empty lv-dash-empty">
+                    <Icon Name="alert" Class="lv-empty-icon" />
+                    <h2>The log store could not be read</h2>
+                    <p>@loadError</p>
+                    <button type="button" class="lv-button" @onclick="RefreshAsync">Try again</button>
+                </div>
             }
-        </div>
+            else if (insights is not null && Total == 0)
+            {
+                <div class="lv-empty lv-dash-empty">
+                    <Icon Name="clock" Class="lv-empty-icon" />
+                    <h2>No events in this range</h2>
+                    <p>
+                        Events written through <code>.WriteTo.LogVue(services)</code> at
+                        <strong>@minimumLevel</strong> or above will show up here.
+                    </p>
+                    <a class="lv-button" href="@LogsHref(filter with { Range = TimeRange.All })">Search all logs</a>
+                </div>
+            }
+            else if (insights is not null)
+            {
+                <div class="lv-stats">
+                    @foreach (var level in TileLevels)
+                    {
+                        <a class="lv-stat lv-level-@level.ToString().ToLowerInvariant()" href="@LevelHref(level)">
+                            <span class="lv-stat-label"><span class="lv-stat-dot"></span>@level</span>
+                            <span class="lv-stat-value">@CountOf(level).ToString("N0", CultureInfo.CurrentCulture)</span>
+                            <span class="lv-stat-delta @DeltaClass(CountOf(level), PreviousCount(level), IncreaseIsBad(level))">
+                                @(Delta(CountOf(level), PreviousCount(level)) ?? Rate(CountOf(level)))
+                            </span>
+                        </a>
+                    }
+                    <a class="lv-stat lv-level-error" href="@ExceptionsHref()">
+                        <span class="lv-stat-label"><Icon Name="alert" Size="14" /> Exceptions</span>
+                        <span class="lv-stat-value">@insights.ExceptionCount.ToString("N0", CultureInfo.CurrentCulture)</span>
+                        <span class="lv-stat-delta @DeltaClass(insights.ExceptionCount, insights.PreviousExceptionCount, increaseIsBad: true)">
+                            @(Delta(insights.ExceptionCount, insights.PreviousExceptionCount) ?? Rate(insights.ExceptionCount))
+                        </span>
+                    </a>
+                    <a class="lv-stat" href="@LogsHref(filter)">
+                        <span class="lv-stat-label"><Icon Name="logs" Size="14" /> Total</span>
+                        <span class="lv-stat-value">@Total.ToString("N0", CultureInfo.CurrentCulture)</span>
+                        <span class="lv-stat-delta lv-muted">@Rate(Total)</span>
+                    </a>
+                </div>
 
-        <div class="lv-list" role="table" aria-label="Log entries" aria-busy="@isLoading">
-            <div class="lv-list-head" role="row">
-                <span role="columnheader">Time <span class="lv-muted">(@time.Label)</span></span>
-                <span role="columnheader">Level</span>
-                <span role="columnheader">Message</span>
-                <span role="columnheader"></span>
-            </div>
+                <section class="lv-panel">
+                    <h2>Volume <span class="lv-muted">@BucketCaption</span></h2>
+                    <Chart Config="InsightsCharts.Volume(VolumeLabels, insights.Volume)" Height="md" />
+                </section>
 
-            <div class="lv-scroll" @ref="scrollElement">
-                <div class="lv-sentinel" @ref="topSentinel"></div>
-
-                @if (pendingEntries.Count > 0)
-                {
-                    <button type="button" class="lv-pending" @onclick="ShowPendingAsync">
-                        @pendingEntries.Count.ToString("N0", CultureInfo.CurrentCulture) new @(pendingEntries.Count == 1 ? "entry" : "entries") ↑
-                    </button>
-                }
-
-                @if (entries is null || (isLoading && entries.Count == 0))
-                {
-                    <div class="lv-skeleton" aria-hidden="true">
-                        @for (int i = 0; i < 12; i++)
+                <div class="lv-dash-split">
+                    <section class="lv-panel">
+                        <h2>By level</h2>
+                        <Chart Config="InsightsCharts.Levels(insights.Levels)" Height="md" />
+                    </section>
+                    <section class="lv-panel">
+                        <h2>Top sources</h2>
+                        @if (insights.TopSources.Count == 0)
                         {
-                            <div class="lv-skeleton-row"></div>
-                        }
-                    </div>
-                }
-                else if (entries.Count == 0)
-                {
-                    <div class="lv-empty">
-                        @if (loadError is not null)
-                        {
-                            <Icon Name="alert" Class="lv-empty-icon" />
-                            <h2>The log store could not be read</h2>
-                            <p>@loadError</p>
-                            <button type="button" class="lv-button" @onclick="RefreshAsync">Try again</button>
-                        }
-                        else if (queryError is not null)
-                        {
-                            <Icon Name="search" Class="lv-empty-icon" />
-                            <h2>That query could not be understood</h2>
-                            <p>@queryError</p>
-                        }
-                        else if (filter.HasCriteria)
-                        {
-                            <Icon Name="search" Class="lv-empty-icon" />
-                            <h2>Nothing matches</h2>
-                            <p>Try a wider time range, fewer levels, or a shorter search.</p>
-                            <button type="button" class="lv-button" @onclick="ResetAsync">Clear filters</button>
+                            <p class="lv-muted">No <code>SourceContext</code> on events in this range.</p>
                         }
                         else
                         {
-                            <Icon Name="clock" Class="lv-empty-icon" />
-                            <h2>No log entries yet</h2>
-                            <p>
-                                Events written through <code>.WriteTo.LogVue(services)</code> at
-                                <strong>@minimumLevel</strong> or above will appear here.
-                            </p>
+                            <Chart Config="InsightsCharts.Names(insights.TopSources)" Height="md" />
                         }
-                    </div>
-                }
-                else
-                {
-                    <div class="lv-rows @(isLoading ? "is-stale" : null)">
-                        <Virtualize Items="entries" ItemSize="RowHeight" OverscanCount="30" Context="entry">
-                            <LogEntryRow @key="entry.Id" Entry="entry" Time="time"
-                                         IsSelected="@(selected?.Id == entry.Id)"
-                                         IsNew="@freshIds.Contains(entry.Id)"
-                                         OnSelect="Select" />
-                        </Virtualize>
-                    </div>
-                }
+                    </section>
+                </div>
 
-                <div class="lv-sentinel" @ref="bottomSentinel"></div>
-
-                @if (entries is { Count: > 0 })
-                {
-                    <div class="lv-list-foot">
-                        @if (isLoadingMore)
-                        {
-                            <span class="lv-spinner lv-spinner-small"></span>
-                            <span>Loading older entries…</span>
-                        }
-                        else if (hasMore)
-                        {
-                            <button type="button" class="lv-button" @onclick="LoadMoreAsync">Load older entries</button>
-                        }
-                        else
-                        {
-                            <span class="lv-muted">That's everything@(filter.HasCriteria ? " that matches" : null).</span>
-                        }
-                    </div>
-                }
-            </div>
+                <section class="lv-panel">
+                    <h2>Repeating messages</h2>
+                    @if (insights.TopTemplates.Count == 0)
+                    {
+                        <p class="lv-muted">Nothing to group yet.</p>
+                    }
+                    else
+                    {
+                        <ol class="lv-rank">
+                            @foreach (var template in insights.TopTemplates)
+                            {
+                                long widest = insights.TopTemplates[0].Count;
+                                double width = widest == 0 ? 0 : Math.Max(template.Count * 100.0 / widest, 2);
+                                <li>
+                                    <a href="@TemplateHref(template.Name)">
+                                        <span class="lv-rank-label">
+                                            <span title="@template.Name">@template.Name</span>
+                                            <span>@template.Count.ToString("N0", CultureInfo.CurrentCulture)</span>
+                                        </span>
+                                        <span class="lv-rank-track">
+                                            <span class="lv-rank-fill" style="width: @(width.ToString("0", CultureInfo.InvariantCulture))%"></span>
+                                        </span>
+                                    </a>
+                                </li>
+                            }
+                        </ol>
+                    }
+                </section>
+            }
         </div>
-    </main>
-
-    @if (selected is not null)
-    {
-        <LogEntryDetails Entry="selected" Time="time" ReadOnly="Settings.ReadOnly"
-                         OnClose="() => selected = null" OnDelete="DeleteEntryAsync" OnFilter="AddConditionAsync" />
-    }
-    </div>
     </ChildContent>
 </AppShell>
-
-<CleanupDialog @ref="cleanupDialog" />
-<ConfirmDialog @ref="confirmDialog" />
-<PromptDialog @ref="promptDialog" />
-
-@code {
-    /// <summary>Must match <c>--lv-row-height</c> in logvue.css, which Virtualize relies on.</summary>
-    private const float RowHeight = 34;
-
-    /// <summary>
-    /// Live tail drops the oldest rows beyond this, so leaving the dashboard following a busy
-    /// application overnight doesn't grow the circuit without bound.
-    /// </summary>
-    private const int MaxLiveEntries = 5000;
-
-    private DashboardFilter filter = new();
-    private List<LogEntryDto>? entries;
-    private List<LogEntryDto> pendingEntries = [];
-    private HashSet<long> freshIds = [];
-    private bool hasMore;
-    private bool isLoading;
-    private bool isLoadingMore;
-    private bool isPolling;
-    private string? queryError;
-    private string? loadError;
-    private IReadOnlyList<LevelCountDto>? levelCounts;
-    private LogStoreSummaryDto? summary;
-    private IReadOnlyList<SavedQueryDto>? savedQueries;
-    private LogEntryDto? selected;
-    private LogEventLevel minimumLevel;
-
-    private TimeDisplay time = TimeDisplay.Utc;
-    private TimeDisplay browserTime = TimeDisplay.Utc;
-    private bool showUtc;
-    private bool isLive;
-    private bool atTop = true;
-
-    private CancellationTokenSource? loadCancellation;
-    private CancellationTokenSource? liveCancellation;
-    private DotNetObjectReference<Dashboard>? selfReference;
-    private IJSObjectReference? listObserver;
-    private ElementReference scrollElement;
-    private ElementReference topSentinel;
-    private ElementReference bottomSentinel;
-    private bool recheckSentinelsAfterRender;
-    private long? revealAfterRender;
-
-    private CleanupDialog cleanupDialog = default!;
-    private ConfirmDialog confirmDialog = default!;
-    private PromptDialog promptDialog = default!;
-
-    private LogVueOptions Settings => Options.Value;
-
-    private DateTime UtcNow => TimeProvider.GetUtcNow().UtcDateTime;
-
-    /// <summary>
-    /// Entries matching the whole filter. The level counts already cover everything but the level
-    /// criterion, so this costs no extra query.
-    /// </summary>
-    private long? MatchingCount => levelCounts?
-        .Where(c => filter.Levels.Count == 0 || filter.Levels.Contains(c.Level))
-        .Sum(c => c.Count);
-
-    protected override void OnInitialized()
-    {
-        filter = DashboardFilter.FromUri(Navigation.Uri);
-        minimumLevel = MinimumLevel.Current;
-        selfReference = DotNetObjectReference.Create(this);
-        Navigation.LocationChanged += OnLocationChanged;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            // Nothing is queried until the browser's time zone is known, so the first rows on
-            // screen already show the right times.
-            var preferences = await JS.InvokeAsync<BrowserPreferences>("logVue.init", selfReference);
-            browserTime = TimeDisplay.ForBrowser(preferences.TimeZone);
-            showUtc = preferences.Utc;
-            time = showUtc ? TimeDisplay.Utc : browserTime;
-
-            listObserver = await JS.InvokeAsync<IJSObjectReference>(
-                "logVue.observeList", scrollElement, topSentinel, bottomSentinel, selfReference);
-
-            await Task.WhenAll(ReloadAsync(), LoadSummaryAsync(), LoadSavedQueriesAsync());
-            return;
-        }
-
-        if (recheckSentinelsAfterRender && listObserver is not null)
-        {
-            recheckSentinelsAfterRender = false;
-            await listObserver.InvokeVoidAsync("recheck");
-        }
-
-        if (revealAfterRender is long id)
-        {
-            revealAfterRender = null;
-            await JS.InvokeVoidAsync("logVue.reveal", $"lv-row-{id}");
-        }
-    }
-
-    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        filter = DashboardFilter.FromUri(e.Location);
-        selected = null;
-        await InvokeAsync(ReloadAsync);
-    }
-
-    private Task ApplyFilterAsync(DashboardFilter next)
-    {
-        Navigation.NavigateTo(next.ToUri(Navigation));
-        return Task.CompletedTask;
-    }
-
-    private Task ApplyQueryAsync(string? query) => ApplyFilterAsync(filter with { Query = query });
-
-    private Task AddConditionAsync(string condition) =>
-        ApplyQueryAsync(LogQueryText.And(queryError is null ? filter.Query : null, condition));
-
-    private Task ResetAsync() => ApplyFilterAsync(new DashboardFilter());
-
-    private async Task RefreshAsync() => await Task.WhenAll(ReloadAsync(), LoadSummaryAsync());
-
-    /// <summary>
-    /// Replaces the list with the newest page for the current filter. Any load still running is
-    /// cancelled, so a slow query for an old filter can't overwrite a newer one.
-    /// </summary>
-    private async Task ReloadAsync()
-    {
-        loadCancellation?.Cancel();
-        loadCancellation?.Dispose();
-        loadCancellation = new CancellationTokenSource();
-        var cancellationToken = loadCancellation.Token;
-
-        isLoading = true;
-        pendingEntries = [];
-        freshIds = [];
-        StateHasChanged();
-
-        var logFilter = filter.ToLogFilter(UtcNow);
-
-        var searchTask = LogEntries.SearchAsync(
-            new LogEntrySearchRequest { Filter = logFilter, PageSize = Settings.PageSize },
-            cancellationToken);
-        var countsTask = LogEntries.GetLevelCountsAsync(logFilter, cancellationToken);
-
-        try
-        {
-            await Task.WhenAll(searchTask, countsTask);
-        }
-        catch (OperationCanceledException)
-        {
-            return;
-        }
-
-        var search = searchTask.Result;
-        var counts = countsTask.Result;
-
-        isLoading = false;
-        queryError = search.Status == ResultStatus.Invalid ? search.GetDisplayMessage() : null;
-        loadError = search.IsSuccess || queryError is not null ? null : search.GetDisplayMessage();
-
-        if (search.IsSuccess)
-        {
-            entries = [.. search.Value.Items];
-            hasMore = search.Value.HasMore;
-        }
-        else
-        {
-            entries = [];
-            hasMore = false;
-        }
-
-        levelCounts = counts.IsSuccess ? counts.Value : null;
-        recheckSentinelsAfterRender = true;
-        StateHasChanged();
-    }
-
-    private async Task LoadMoreAsync()
-    {
-        if (!hasMore || isLoading || isLoadingMore || entries is not { Count: > 0 })
-        {
-            return;
-        }
-
-        isLoadingMore = true;
-        StateHasChanged();
-
-        var cancellationToken = loadCancellation?.Token ?? CancellationToken.None;
-        Result<LogEntryPageDto> result;
-
-        try
-        {
-            result = await LogEntries.SearchAsync(
-                new LogEntrySearchRequest
-                {
-                    Filter = filter.ToLogFilter(UtcNow),
-                    BeforeId = entries[^1].Id,
-                    PageSize = Settings.PageSize,
-                },
-                cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            return;
-        }
-        finally
-        {
-            isLoadingMore = false;
-        }
-
-        if (result.IsSuccess)
-        {
-            entries.AddRange(result.Value.Items);
-            hasMore = result.Value.HasMore;
-            recheckSentinelsAfterRender = true;
-        }
-        else
-        {
-            Toasts.ShowFailure(result);
-        }
-
-        StateHasChanged();
-    }
-
-    private async Task LoadSummaryAsync()
-    {
-        var result = await LogEntries.GetSummaryAsync();
-        summary = result.IsSuccess ? result.Value : null;
-        StateHasChanged();
-    }
-
-    private async Task LoadSavedQueriesAsync()
-    {
-        var result = await SavedQueries.GetAllAsync();
-
-        if (result.IsSuccess)
-        {
-            savedQueries = result.Value;
-        }
-        else
-        {
-            savedQueries = [];
-            Toasts.ShowFailure(result);
-        }
-
-        StateHasChanged();
-    }
-
-    private void ToggleLive()
-    {
-        isLive = !isLive;
-
-        liveCancellation?.Cancel();
-        liveCancellation?.Dispose();
-        liveCancellation = null;
-
-        if (isLive)
-        {
-            liveCancellation = new CancellationTokenSource();
-            _ = FollowAsync(liveCancellation.Token);
-        }
-    }
-
-    private async Task FollowAsync(CancellationToken cancellationToken)
-    {
-        using var timer = new PeriodicTimer(Settings.LiveRefreshInterval, TimeProvider);
-
-        try
-        {
-            while (await timer.WaitForNextTickAsync(cancellationToken))
-            {
-                await InvokeAsync(PollAsync);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-        }
-    }
-
-    /// <summary>
-    /// Fetches only what arrived since the newest entry already held. While the list is scrolled
-    /// away from the top, new entries wait behind a button instead of shifting what is being read.
-    /// </summary>
-    private async Task PollAsync()
-    {
-        if (isLoading || isLoadingMore || isPolling || entries is null || queryError is not null)
-        {
-            return;
-        }
-
-        isPolling = true;
-
-        try
-        {
-            if (freshIds.Count > 0)
-            {
-                freshIds = [];
-            }
-
-            long newestId = pendingEntries.Count > 0 ? pendingEntries[0].Id : entries.Count > 0 ? entries[0].Id : 0;
-            var cancellationToken = loadCancellation?.Token ?? CancellationToken.None;
-            var logFilter = filter.ToLogFilter(UtcNow);
-
-            var result = await LogEntries.SearchAsync(
-                new LogEntrySearchRequest { Filter = logFilter, AfterId = newestId, PageSize = Settings.PageSize },
-                cancellationToken);
-
-            if (!result.IsSuccess || result.Value.Items.Count == 0)
-            {
-                StateHasChanged();
-                return;
-            }
-
-            if (result.Value.HasMore)
-            {
-                // More arrived than one page holds: start over rather than leave a hole in the list.
-                await ReloadAsync();
-                return;
-            }
-
-            if (atTop && pendingEntries.Count == 0)
-            {
-                Prepend(result.Value.Items);
-            }
-            else
-            {
-                pendingEntries.InsertRange(0, result.Value.Items);
-            }
-
-            var counts = await LogEntries.GetLevelCountsAsync(logFilter, cancellationToken);
-            if (counts.IsSuccess)
-            {
-                levelCounts = counts.Value;
-            }
-
-            StateHasChanged();
-        }
-        catch (OperationCanceledException)
-        {
-        }
-        finally
-        {
-            isPolling = false;
-        }
-    }
-
-    private void Prepend(IReadOnlyList<LogEntryDto> newer)
-    {
-        if (entries is null || newer.Count == 0)
-        {
-            return;
-        }
-
-        freshIds = [.. newer.Select(e => e.Id)];
-        entries.InsertRange(0, newer);
-
-        if (entries.Count > MaxLiveEntries)
-        {
-            entries.RemoveRange(MaxLiveEntries, entries.Count - MaxLiveEntries);
-            hasMore = true;
-        }
-    }
-
-    private async Task ShowPendingAsync()
-    {
-        Prepend(pendingEntries);
-        pendingEntries = [];
-
-        if (listObserver is not null)
-        {
-            await listObserver.InvokeVoidAsync("scrollToTop");
-        }
-    }
-
-    private void Select(LogEntryDto entry) => selected = selected?.Id == entry.Id ? null : entry;
-
-    private async Task DeleteEntryAsync(LogEntryDto entry)
-    {
-        bool confirmed = await confirmDialog.ShowAsync(
-            "Delete this entry?",
-            "It will be removed from the log store permanently.",
-            "Delete",
-            isDestructive: true);
-
-        if (!confirmed)
-        {
-            return;
-        }
-
-        var result = await LogEntries.DeleteAsync(entry.Id);
-
-        if (!result.IsSuccess && result.Status != ResultStatus.NotFound)
-        {
-            Toasts.ShowFailure(result);
-            return;
-        }
-
-        // Selecting the next entry keeps a run of deletions to one click each.
-        int index = entries?.FindIndex(e => e.Id == entry.Id) ?? -1;
-        if (index >= 0)
-        {
-            entries!.RemoveAt(index);
-        }
-
-        selected = entries is { Count: > 0 } && index >= 0 ? entries[Math.Min(index, entries.Count - 1)] : null;
-
-        Toasts.Success("Entry deleted.");
-        await RefreshCountsAsync();
-    }
-
-    private async Task OpenCleanupAsync()
-    {
-        int? deleted = await cleanupDialog.ShowAsync(filter.ToLogFilter(UtcNow), filter.HasCriteria, DescribeFilter());
-
-        if (deleted is int count)
-        {
-            Toasts.Success($"Deleted {count.ToString("N0", CultureInfo.CurrentCulture)} {(count == 1 ? "entry" : "entries")}.");
-            selected = null;
-            await RefreshAsync();
-        }
-    }
-
-    private async Task RefreshCountsAsync()
-    {
-        var counts = await LogEntries.GetLevelCountsAsync(filter.ToLogFilter(UtcNow));
-        levelCounts = counts.IsSuccess ? counts.Value : levelCounts;
-        await LoadSummaryAsync();
-    }
-
-    private string DescribeFilter()
-    {
-        var parts = new List<string>();
-
-        if (!string.IsNullOrWhiteSpace(filter.Query))
-        {
-            parts.Add($"“{filter.Query}”");
-        }
-
-        if (filter.Levels.Count > 0)
-        {
-            parts.Add(string.Join(", ", LogLevels.All.Where(filter.Levels.Contains)));
-        }
-
-        if (filter.ExceptionsOnly)
-        {
-            parts.Add("with exceptions");
-        }
-
-        if (filter.Range != TimeRange.All)
-        {
-            parts.Add(filter.Range == TimeRange.Custom ? "custom time range" : filter.Range.Label.ToLowerInvariant());
-        }
-
-        return string.Join(" · ", parts);
-    }
-
-    private async Task SaveQueryAsync()
-    {
-        if (string.IsNullOrWhiteSpace(filter.Query))
-        {
-            return;
-        }
-
-        string? existingName = savedQueries?.FirstOrDefault(q => q.Query == filter.Query)?.Name;
-
-        string? name = await promptDialog.ShowAsync(
-            "Save query",
-            "Name",
-            existingName,
-            "Save",
-            description: filter.Query,
-            maxLength: 128);
-
-        if (name is null)
-        {
-            return;
-        }
-
-        var result = await SavedQueries.SaveAsync(new SaveQueryRequest { Name = name, Query = filter.Query });
-
-        if (!result.IsSuccess)
-        {
-            Toasts.ShowFailure(result);
-            return;
-        }
-
-        Toasts.Success($"Saved “{result.Value.Name}”.");
-        await LoadSavedQueriesAsync();
-    }
-
-    private async Task DeleteSavedQueryAsync(SavedQueryDto query)
-    {
-        bool confirmed = await confirmDialog.ShowAsync(
-            "Delete saved query?",
-            $"“{query.Name}” will be removed. Log entries are not affected.",
-            "Delete",
-            isDestructive: true);
-
-        if (!confirmed)
-        {
-            return;
-        }
-
-        var result = await SavedQueries.DeleteAsync(query.Id);
-
-        if (!result.IsSuccess && result.Status != ResultStatus.NotFound)
-        {
-            Toasts.ShowFailure(result);
-            return;
-        }
-
-        await LoadSavedQueriesAsync();
-    }
-
-    private void SetMinimumLevel(ChangeEventArgs e)
-    {
-        if (!Enum.TryParse<LogEventLevel>(e.Value?.ToString(), out var level))
-        {
-            return;
-        }
-
-        var result = MinimumLevel.Set(level);
-
-        if (result.IsSuccess)
-        {
-            minimumLevel = level;
-            Toasts.Success($"Now storing {level} and above.");
-        }
-        else
-        {
-            Toasts.ShowFailure(result);
-        }
-    }
-
-    private async Task ToggleUtcAsync()
-    {
-        showUtc = !showUtc;
-        time = showUtc ? TimeDisplay.Utc : browserTime;
-        await JS.InvokeVoidAsync("logVue.setUtc", showUtc);
-    }
-
-    [JSInvokable]
-    public Task OnBottomVisible() => LoadMoreAsync();
-
-    [JSInvokable]
-    public void OnTopVisibilityChanged(bool isVisible)
-    {
-        atTop = isVisible;
-
-        // Back at the top: whatever arrived meanwhile can go straight in.
-        if (atTop && pendingEntries.Count > 0)
-        {
-            Prepend(pendingEntries);
-            pendingEntries = [];
-        }
-
-        StateHasChanged();
-    }
-
-    [JSInvokable]
-    public void OnShortcut(string key)
-    {
-        switch (key)
-        {
-            case "Escape":
-                selected = null;
-                break;
-
-            case "j" or "k" when entries is { Count: > 0 }:
-                int index = selected is null ? -1 : entries.FindIndex(e => e.Id == selected.Id);
-                int next = key == "j" ? index + 1 : index - 1;
-                selected = entries[Math.Clamp(next, 0, entries.Count - 1)];
-                revealAfterRender = selected.Id;
-
-                if (key == "j" && next >= entries.Count - 5)
-                {
-                    _ = LoadMoreAsync();
-                }
-                break;
-
-            default:
-                return;
-        }
-
-        StateHasChanged();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        Navigation.LocationChanged -= OnLocationChanged;
-
-        loadCancellation?.Cancel();
-        loadCancellation?.Dispose();
-        liveCancellation?.Cancel();
-        liveCancellation?.Dispose();
-
-        if (listObserver is not null)
-        {
-            try
-            {
-                await listObserver.InvokeVoidAsync("dispose");
-                await listObserver.DisposeAsync();
-            }
-            catch (JSDisconnectedException)
-            {
-                // The circuit is already gone, and the observer with it.
-            }
-        }
-
-        selfReference?.Dispose();
-    }
-
-    private sealed record BrowserPreferences(string? TimeZone, bool Utc);
-}

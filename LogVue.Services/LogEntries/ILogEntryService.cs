@@ -20,6 +20,12 @@ public interface ILogEntryService
 
     Task<Result<LogStoreSummaryDto>> GetSummaryAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Counts, a time series and the noisiest sources and templates for <paramref name="filter"/>.
+    /// The overview's charts are drawn from this rather than from a page of entries.
+    /// </summary>
+    Task<Result<LogInsightsDto>> GetInsightsAsync(LogFilter filter, CancellationToken cancellationToken = default);
+
     /// <summary>How many entries <see cref="DeleteMatchingAsync"/> would remove.</summary>
     Task<Result<long>> CountMatchingAsync(LogFilter filter, CancellationToken cancellationToken = default);
 

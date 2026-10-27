@@ -121,6 +121,13 @@ public class ProviderTests
         Assert.Equal(5, summary.TotalCount);
         Assert.Equal(now.AddDays(-40), summary.OldestUtc!.Value, TimeSpan.FromMilliseconds(1));
 
+        var insights = await service.GetInsightsAsync(new LogFilter { FromUtc = now.AddHours(-1), ToUtc = now.AddMinutes(1) });
+        Assert.True(insights.IsSuccess, insights.GetDisplayMessage());
+        Assert.Equal(1, insights.Value.ExceptionCount);
+        Assert.Equal(1, insights.Value.Levels.Single(c => c.Level == LogEventLevel.Error).Count);
+        Assert.Contains(insights.Value.TopSources, s => s.Name == "Shop.Api.OrdersController");
+        Assert.NotEmpty(insights.Value.Volume);
+
         // Deletes, including the cascade to properties.
         Assert.Equal(1, (await service.DeleteOlderThanAsync(now.AddDays(-30))).Value);
         Assert.Equal(1, (await service.CountMatchingAsync(new LogFilter { Query = "Customer = 'contoso'" })).Value);

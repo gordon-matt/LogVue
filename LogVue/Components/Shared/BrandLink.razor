@@ -1,0 +1,33 @@
+@inject IOptions<LogVueOptions> Options
+
+<div class="nf-sidebar-brand">
+    <a class="nf-brand-link" href="@Href" aria-label="@Settings.Title"
+       @onclick="OnClick" @onclick:preventDefault="PreventNavigation">
+        @if (Branding.CustomLogoUrl(Settings) is { } logo)
+        {
+            <img class="nf-brand-logo" src="@logo" alt="" />
+        }
+        else if (Branding.HasCustomTitle(Settings))
+        {
+            <span class="nf-brand-text">@Settings.Title</span>
+        }
+        else
+        {
+            <img class="nf-brand-logo" src="@EmbeddedAssets.Url("Logo.png")" alt="" width="114" height="34" />
+        }
+    </a>
+</div>
+
+@code {
+    private LogVueOptions Settings => Options.Value;
+
+    [Parameter]
+    public string Href { get; set; } = "./";
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    /// <summary>Set when <see cref="OnClick"/> replaces following <see cref="Href"/>.</summary>
+    [Parameter]
+    public bool PreventNavigation { get; set; }
+}

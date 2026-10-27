@@ -57,7 +57,11 @@ public sealed record DashboardFilter
         ToUtc = Range == TimeRange.Custom ? ToUtc : null,
     };
 
-    public string ToUri(NavigationManager navigation) => navigation.GetUriWithQueryParameters(
+    /// <param name="includeAllRange">
+    /// Writes <c>range=all</c> instead of omitting it. The overview uses that so a bare address
+    /// can mean "the default window" while an explicit All still round-trips.
+    /// </param>
+    public string ToUri(NavigationManager navigation, bool includeAllRange = false) => navigation.GetUriWithQueryParameters(
         new Dictionary<string, object?>
         {
             [QueryKey] = string.IsNullOrWhiteSpace(Query) ? null : Query.Trim(),
@@ -65,7 +69,7 @@ public sealed record DashboardFilter
                 ? null
                 : string.Join(',', LogLevels.All.Where(Levels.Contains).Select(l => LogLevels.ShortName(l).ToLowerInvariant())),
             [ExceptionsKey] = ExceptionsOnly ? "1" : null,
-            [RangeKey] = Range == TimeRange.All ? null : Range.Key,
+            [RangeKey] = Range == TimeRange.All ? includeAllRange ? TimeRange.AllKey : null : Range.Key,
             [FromKey] = Range == TimeRange.Custom ? FormatDate(FromUtc) : null,
             [ToKey] = Range == TimeRange.Custom ? FormatDate(ToUtc) : null,
         });
