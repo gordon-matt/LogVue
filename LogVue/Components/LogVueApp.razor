@@ -1,4 +1,5 @@
 @inject IOptions<LogVueOptions> Options
+@inject IOptions<ForgeShellOptions> Shell
 @inject IOptions<ForgeUiOptions> UiOptions
 
 <!DOCTYPE html>
@@ -30,13 +31,13 @@
 
     <div id="lv-boot" class="lv-boot">
         <div class="lv-boot-panel">
-            @if (Branding.CustomLogoUrl(Options.Value) is { } logo)
+            @if (ForgeBrand.Logo(Shell.Value) is { } logo)
             {
                 <img class="lv-boot-logo" src="@logo" alt="" />
             }
-            else if (Branding.HasCustomTitle(Options.Value))
+            else if (ForgeBrand.Name(Shell.Value) is { } brand)
             {
-                <p class="lv-boot-title">@Options.Value.Title</p>
+                <p class="lv-boot-title">@brand</p>
             }
             else
             {

@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions
             // The shell reads ForgeUiOptions for the shared theme key. A host that also calls
             // AddNetForgeComponents keeps its own key; this only fills the options in when it does not.
             services.AddNetForgeComponents();
+            services.AddNetForgeMenuContributor<LogVueMenuContributor>();
             services.TryAddSingleton<IAuthProviderService>(new AuthProviderService(AuthProvider.Identity, null));
 
             return services;

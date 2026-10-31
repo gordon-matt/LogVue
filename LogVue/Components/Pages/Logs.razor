@@ -10,9 +10,12 @@
 @inject IJSRuntime JS
 
 <AppShell ShowSearch="false" ShowThemePicker="false" ShowUserMenu="false" ShowVersion="false" CollapsibleSidebar="false">
+    <TopbarMenu>
+        <HostMenu />
+    </TopbarMenu>
     <Sidebar>
         <nav class="nf-sidebar" id="nf-sidebar" aria-label="Filters">
-            <BrandLink PreventNavigation="true" OnClick="ResetAsync" />
+            <BrandLink />
             <div class="nf-sidebar-scroll">
                 <SectionNav />
                 <div class="lv-filters">

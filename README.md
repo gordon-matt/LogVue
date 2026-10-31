@@ -113,10 +113,14 @@ still use the sink.
 Bind them from configuration with
 `builder.Configuration.GetSection(LogVueOptions.SectionName).Bind(options)`, or set them in code.
 
+The header logo, dark logo, mark, and name are the host's `ForgeShellOptions`
+(`LogoUrl`, `LogoDarkUrl`, `MarkUrl`, `Brand`). One setting covers the shell and every NetForge
+library. A path can be root-relative (`/img/Logo.png`), app-relative (`img/Logo.png` or `~/img/Logo.png`),
+or an absolute URL. With none set, the dashboard keeps the LogVue logo.
+
 | Option                        | Default    | Description |
 |-------------------------------|------------|-------------|
-| `Title`                       | `LogVue`   | Browser tab title. Shown in the header when it is not `LogVue` and `LogoPath` is unset. |
-| `LogoPath`                    |            | Header image. Overrides `Title`. Root-relative (`/logo.png`), app-relative (`~/logo.png`), or an absolute URL. |
+| `Title`                       | `LogVue`   | Browser tab title. The header logo and name come from the host's `ForgeShellOptions`. |
 | `BasePath`                    | `/logvue`  | Where the dashboard is mounted. |
 | `Area`                        |            | Theme area. Set `Admin` to share the back-office theme; leave unset to follow the public site. |
 | `ReadOnly`                    | `false`    | Hides and refuses deletes and level changes. |

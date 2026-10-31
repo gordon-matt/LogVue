@@ -5,11 +5,15 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Description>An in-process Blazor dashboard for viewing, querying and deleting an ASP.NET Core application's logs.</Description>
-		<Version>1.1.1</Version>
+		<Version>1.1.2</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LogVue.Services\LogVue.Services.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -29,10 +33,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Heroicsoft.NetForge.Components" Version="1.1.1" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\LogVue.Services\LogVue.Services.csproj" />
+	  <PackageReference Include="Heroicsoft.NetForge.Components" Version="1.2.0" />
 	</ItemGroup>
 </Project>

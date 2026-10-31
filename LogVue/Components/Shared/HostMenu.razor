@@ -1,0 +1,4 @@
+@inject IOptions<LogVueOptions> Options
+
+@* Inactive apps only. This page's own navigation stays in the sidebar. *@
+<NetForgeMenu Name="@Options.Value.MenuName" Placement="NetForgeMenuPlacement.Topbar" />

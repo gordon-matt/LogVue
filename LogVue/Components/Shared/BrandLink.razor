@@ -1,15 +1,20 @@
 @inject IOptions<LogVueOptions> Options
+@inject IOptions<ForgeShellOptions> Shell
 
 <div class="nf-sidebar-brand">
-    <a class="nf-brand-link" href="@Href" aria-label="@Settings.Title"
+    <a class="nf-brand-link" href="@Target" data-enhance="false" aria-label="@Label"
        @onclick="OnClick" @onclick:preventDefault="PreventNavigation">
-        @if (Branding.CustomLogoUrl(Settings) is { } logo)
+        @if (ForgeBrand.Logo(Shell.Value) is { } logo)
         {
-            <img class="nf-brand-logo" src="@logo" alt="" />
+            <img class="nf-brand-logo @(DarkLogo is not null ? "nf-has-dark" : null)" src="@logo" alt="@Label" />
+            @if (DarkLogo is { } dark)
+            {
+                <img class="nf-brand-logo-dark" src="@dark" alt="" />
+            }
         }
-        else if (Branding.HasCustomTitle(Settings))
+        else if (ForgeBrand.Name(Shell.Value) is { } brand)
         {
-            <span class="nf-brand-text">@Settings.Title</span>
+            <span class="nf-brand-text">@brand</span>
         }
         else
         {
@@ -19,10 +24,15 @@
 </div>
 
 @code {
-    private LogVueOptions Settings => Options.Value;
+    private string? DarkLogo => ForgeBrand.LogoDark(Shell.Value);
 
+    private string Label => ForgeBrand.Name(Shell.Value) ?? Options.Value.Title;
+
+    /// <summary>Overrides the host's brand address. Empty follows <see cref="ForgeShellOptions.BrandHref"/>.</summary>
     [Parameter]
-    public string Href { get; set; } = "./";
+    public string? Href { get; set; }
+
+    private string Target => string.IsNullOrWhiteSpace(Href) ? ForgeBrand.Home(Shell.Value) : Href;
 
     [Parameter]
     public EventCallback OnClick { get; set; }
