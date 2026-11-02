@@ -2,7 +2,7 @@
 @inject IOptions<ForgeShellOptions> Shell
 
 <div class="nf-sidebar-brand">
-    <a class="nf-brand-link" href="@Target" data-enhance="false" aria-label="@Label"
+    <a class="nf-brand-link" href="@Target" data-enhance-nav="false" aria-label="@Label"
        @onclick="OnClick" @onclick:preventDefault="PreventNavigation">
         @if (ForgeBrand.Logo(Shell.Value) is { } logo)
         {
