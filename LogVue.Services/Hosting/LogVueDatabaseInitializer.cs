@@ -14,11 +14,16 @@ public sealed class LogVueDatabaseInitializer(
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         // Checked here rather than at registration so the provider call can come before or after
-        // AddLogVue. A missing provider is a configuration mistake, so it stops the host.
-        var contextFactory = services.GetService<ILogVueDbContextFactory>()
-            ?? throw new InvalidOperationException(
-                "LogVue has no storage provider. Call AddLogVueSqlite, AddLogVueSqlServer, " +
-                "AddLogVueNpgsql or AddLogVueMySql from the matching LogVue.Data package.");
+        // AddLogVue. A host that has no connection yet, such as one showing its installation page,
+        // can start without a provider. Nothing is stored until one is registered and the host restarts.
+        var contextFactory = services.GetService<ILogVueDbContextFactory>();
+        if (contextFactory is null)
+        {
+            databaseState.MarkFailed();
+            logger.LogWarning(
+                "LogVue has no storage provider, so log entries will not be stored. Call AddLogVueSqlite, AddLogVueSqlServer, AddLogVueNpgsql or AddLogVueMySql from the matching LogVue.Data package.");
+            return;
+        }
 
         if (!options.Value.AutoMigrate)
         {
