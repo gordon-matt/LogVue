@@ -1,4 +1,4 @@
-<img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Logo.png" alt="Logo" width="300" />
+<img src="https://github.com/gordon-matt/LogVue/raw/master/_Misc/Logo.png" alt="Logo" width="300" />
 
 An in-process log dashboard for ASP.NET Core. LogVue is a `Microsoft.Extensions.Logging` provider
 plus a Blazor dashboard shipped as a Razor Class Library: add a few lines to `Program.cs` and your
@@ -21,13 +21,13 @@ LogVue is a modernised take on [Sejil](https://github.com/alaatm/Sejil), with:
 
 ## Screenshots
 
-<img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Screenshots/Overview_Dark.png" alt="Dark Theme" />
+<img src="https://github.com/gordon-matt/LogVue/raw/master/_Misc/Screenshots/Overview_Dark.png" alt="Dark Theme" />
 
-<img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Screenshots/Theme_Dark.png" alt="Dark Theme" />
+<img src="https://github.com/gordon-matt/LogVue/raw/master/_Misc/Screenshots/Theme_Dark.png" alt="Dark Theme" />
 
-<img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Screenshots/Overview_Light.png" alt="Light Theme" />
+<img src="https://github.com/gordon-matt/LogVue/raw/master/_Misc/Screenshots/Overview_Light.png" alt="Light Theme" />
 
-<img src="https://github.com/gordon-matt/LogVue/blob/master/_Misc/Screenshots/Theme_Light.png" alt="Light Theme" />
+<img src="https://github.com/gordon-matt/LogVue/raw/master/_Misc/Screenshots/Theme_Light.png" alt="Light Theme" />
 
 ## Getting started
 
@@ -248,12 +248,12 @@ If you find this project useful, consider supporting its development.
 
 <p align="center">
   <a href="https://buymeacoffee.com/vnmatt">
-    <img src="https://github.com/gordon-matt/MyResume/blob/gh-pages/assets/images/BuyMeACoffee_Logo.png"
+    <img src="https://github.com/gordon-matt/MyResume/raw/gh-pages/assets/images/BuyMeACoffee_Logo.png"
          alt="Buy Me a Coffee"
          height="40">
   </a>&nbsp;&nbsp;&nbsp;
   <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=gordon_matt%40live%2ecom&lc=AU&currency_code=AUD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted">
-    <img src="https://github.com/gordon-matt/MyResume/blob/gh-pages/assets/images/PayPal_Logo.png"
+    <img src="https://github.com/gordon-matt/MyResume/raw/gh-pages/assets/images/PayPal_Logo.png"
          alt="Donate with PayPal"
          height="40">
   </a>
@@ -265,7 +265,7 @@ If you find this project useful, consider supporting its development.
 
 <p align="center">
   <a href="https://buymeacoffee.com/vnmatt">
-    <img src="https://github.com/gordon-matt/MyResume/blob/gh-pages/assets/images/BuyMeACoffee_QR.png"
+    <img src="https://github.com/gordon-matt/MyResume/raw/gh-pages/assets/images/BuyMeACoffee_QR.png"
          alt="Buy Me a Coffee QR Code"
          width="180">
   </a>

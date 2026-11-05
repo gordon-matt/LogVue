@@ -1,3 +1,4 @@
+using Heroicsoft.NetForge.Components;
 using LogVue;
 using LogVue.Data.MySql;
 using LogVue.Data.Npgsql;
@@ -16,6 +17,8 @@ builder.Services.AddLogVue(options =>
     builder.Configuration.GetSection(LogVueOptions.SectionName).Bind(options);
     options.MinimumLevel = LogVueLevel.Debug;
 });
+
+builder.Services.ConfigureNetForgeToastSounds(sounds => sounds.EnableSounds = true);
 
 string provider = builder.Configuration["Database:Provider"] ?? Constants.DatabaseProviders.Sqlite;
 string? connectionString = builder.Configuration.GetConnectionString("LogVue");
