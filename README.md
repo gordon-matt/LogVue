@@ -59,8 +59,9 @@ app.Run();
 ```
 
 Browse to `/logvue` for the overview, or `/logvue/logs` to search. LogVue applies its migrations at startup, so the tables appear on first run.
-Its tables are prefixed `LogVue_`, and it keeps its own migrations history table, so it can share
-a database with your app.
+Its tables live in the `logvue` schema on SQL Server and PostgreSQL. MySQL and SQLite have no usable
+schemas, so there the tables are prefixed `LogVue_`. LogVue keeps its own migrations history table, so
+it can share a database with your app.
 
 If you call `AddLogVueSqlite()` with no connection string, logs go to
 `%LOCALAPPDATA%\{YourApp}\LogVue.db` (or `~/.local/share/{YourApp}/LogVue.db`), outside the

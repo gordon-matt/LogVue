@@ -33,7 +33,7 @@ public class LogVueDbContextFactory(string connectionString) : ILogVueDbContextF
 
         optionsBuilder.UseSqlServer(connectionString, sql => sql
             .MigrationsAssembly(typeof(LogVueDbContext).Assembly.GetName().Name)
-            .MigrationsHistoryTable(Constants.MigrationsHistoryTable));
+            .MigrationsHistoryTable(Constants.MigrationsHistoryTable, Constants.Schema));
 
         // LogVue writes through this context. If EF logged its own INSERTs, they would be stored again.
         optionsBuilder.UseLoggerFactory(NullLoggerFactory.Instance);

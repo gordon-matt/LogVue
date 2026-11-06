@@ -12,24 +12,32 @@ public static class Constants
     /// </summary>
     public const string MigrationsHistoryTable = "__LogVueMigrationsHistory";
 
+    /// <summary>Database schema for providers that support one (SQL Server and PostgreSQL).</summary>
+    public const string Schema = "logvue";
+
     /// <summary>
-    /// Table names are prefixed rather than schema-qualified because SQLite and MySQL have no
-    /// schemas, and one naming scheme across all providers is easier to find in a shared database.
+    /// Prepended to every table name on providers without schemas. In MySQL a schema is a database,
+    /// and SQLite has none, so the tables stay unqualified and are prefixed instead.
+    /// </summary>
+    public const string TablePrefix = "LogVue_";
+
+    /// <summary>
+    /// Unqualified table names. The schema or <see cref="TablePrefix"/> is applied by the context.
     /// </summary>
     public static class Tables
     {
         /// <summary>
         /// The entries constant.
         /// </summary>
-        public const string Entries = "LogVueEntries";
+        public const string Entries = "Entries";
         /// <summary>
         /// The entry properties constant.
         /// </summary>
-        public const string EntryProperties = "LogVueEntryProperties";
+        public const string EntryProperties = "EntryProperties";
         /// <summary>
         /// The saved queries constant.
         /// </summary>
-        public const string SavedQueries = "LogVueSavedQueries";
+        public const string SavedQueries = "SavedQueries";
     }
 
     /// <summary>

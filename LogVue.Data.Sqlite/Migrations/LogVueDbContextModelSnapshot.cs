@@ -15,7 +15,7 @@ namespace LogVue.Data.Sqlite.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.14");
 
             modelBuilder.Entity("LogVue.Data.Entities.LogEntry", b =>
                 {
@@ -52,7 +52,7 @@ namespace LogVue.Data.Sqlite.Migrations
 
                     b.HasIndex("Level", "Id");
 
-                    b.ToTable("LogVueEntries", (string)null);
+                    b.ToTable("LogVue_Entries", (string)null);
                 });
 
             modelBuilder.Entity("LogVue.Data.Entities.LogEntryProperty", b =>
@@ -80,7 +80,7 @@ namespace LogVue.Data.Sqlite.Migrations
 
                     b.HasIndex("LogEntryId", "Name");
 
-                    b.ToTable("LogVueEntryProperties", (string)null);
+                    b.ToTable("LogVue_EntryProperties", (string)null);
                 });
 
             modelBuilder.Entity("LogVue.Data.Entities.SavedQuery", b =>
@@ -110,7 +110,7 @@ namespace LogVue.Data.Sqlite.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("LogVueSavedQueries", (string)null);
+                    b.ToTable("LogVue_SavedQueries", (string)null);
                 });
 
             modelBuilder.Entity("LogVue.Data.Entities.LogEntryProperty", b =>

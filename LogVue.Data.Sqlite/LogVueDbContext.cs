@@ -8,6 +8,9 @@ public class LogVueDbContext(DbContextOptions<LogVueDbContext> options) : LogVue
     private const string CaseInsensitive = "NOCASE";
 
     /// <inheritdoc/>
+    protected override bool SupportsSchemas => false;
+
+    /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

@@ -17,7 +17,8 @@ namespace LogVue.Data.Npgsql.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasDefaultSchema("logvue")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -56,7 +57,7 @@ namespace LogVue.Data.Npgsql.Migrations
 
                     b.HasIndex("Level", "Id");
 
-                    b.ToTable("LogVueEntries", (string)null);
+                    b.ToTable("Entries", "logvue");
                 });
 
             modelBuilder.Entity("LogVue.Data.Entities.LogEntryProperty", b =>
@@ -84,7 +85,7 @@ namespace LogVue.Data.Npgsql.Migrations
 
                     b.HasIndex("LogEntryId", "Name");
 
-                    b.ToTable("LogVueEntryProperties", (string)null);
+                    b.ToTable("EntryProperties", "logvue");
                 });
 
             modelBuilder.Entity("LogVue.Data.Entities.SavedQuery", b =>
@@ -115,7 +116,7 @@ namespace LogVue.Data.Npgsql.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("LogVueSavedQueries", (string)null);
+                    b.ToTable("SavedQueries", "logvue");
                 });
 
             modelBuilder.Entity("LogVue.Data.Entities.LogEntryProperty", b =>

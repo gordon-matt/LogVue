@@ -5,4 +5,6 @@ namespace LogVue.Data.MySql;
 /// </summary>
 public class LogVueDbContext(DbContextOptions<LogVueDbContext> options) : LogVueDbContextBase(options)
 {
+    /// <inheritdoc/>
+    protected override bool SupportsSchemas => false;
 }
