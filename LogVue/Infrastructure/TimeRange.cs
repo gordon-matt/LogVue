@@ -3,13 +3,28 @@ namespace LogVue.Infrastructure;
 /// <summary>A choice in the time range picker. Relative ranges slide with the clock, so live tail keeps up.</summary>
 public sealed record TimeRange(string Key, string Label, TimeSpan? Span)
 {
+    /// <summary>
+    /// The all key constant.
+    /// </summary>
     public const string AllKey = "all";
+    /// <summary>
+    /// The custom key constant.
+    /// </summary>
     public const string CustomKey = "custom";
 
+    /// <summary>
+    /// Gets the all.
+    /// </summary>
     public static TimeRange All { get; } = new(AllKey, "All time", null);
 
+    /// <summary>
+    /// Gets the custom.
+    /// </summary>
     public static TimeRange Custom { get; } = new(CustomKey, "Custom range", null);
 
+    /// <summary>
+    /// Gets the presets.
+    /// </summary>
     public static IReadOnlyList<TimeRange> Presets { get; } =
     [
         new("15m", "Last 15 minutes", TimeSpan.FromMinutes(15)),
@@ -21,6 +36,11 @@ public sealed record TimeRange(string Key, string Label, TimeSpan? Span)
         All,
     ];
 
+    /// <summary>
+    /// Finds the value.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    /// <returns>The time range.</returns>
     public static TimeRange Find(string? key) =>
         key == CustomKey
             ? Custom

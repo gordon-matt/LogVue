@@ -23,14 +23,29 @@
     private TimeDisplay? renderedTime;
     private bool shouldRender = true;
 
+    /// <summary>
+    /// Gets or sets the entry.
+    /// </summary>
     [Parameter, EditorRequired] public LogEntryDto Entry { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the time.
+    /// </summary>
     [Parameter, EditorRequired] public TimeDisplay Time { get; set; } = TimeDisplay.Utc;
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this instance is selected.
+    /// </summary>
     [Parameter] public bool IsSelected { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this instance is new.
+    /// </summary>
     [Parameter] public bool IsNew { get; set; }
 
+    /// <summary>
+    /// Gets or sets the callback raised for the select event.
+    /// </summary>
     [Parameter] public EventCallback<LogEntryDto> OnSelect { get; set; }
 
     /// <summary>The class name alone; the namespace is in the tooltip and the details panel.</summary>
@@ -38,6 +53,7 @@
         ? source[(source.LastIndexOf('.') + 1)..]
         : null;
 
+    /// <inheritdoc/>
     protected override void OnParametersSet()
     {
         // Entries are immutable, so a row only needs to re-render when it is given a different
@@ -54,5 +70,6 @@
         renderedTime = Time;
     }
 
+    /// <inheritdoc/>
     protected override bool ShouldRender() => shouldRender;
 }

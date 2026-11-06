@@ -34,11 +34,23 @@ else
     /// <summary>Null while loading.</summary>
     [Parameter] public IReadOnlyList<SavedQueryDto>? Queries { get; set; }
 
+    /// <summary>
+    /// Gets or sets the active query.
+    /// </summary>
     [Parameter] public string? ActiveQuery { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this instance is read only.
+    /// </summary>
     [Parameter] public bool ReadOnly { get; set; }
 
+    /// <summary>
+    /// Gets or sets the callback raised for the apply event.
+    /// </summary>
     [Parameter] public EventCallback<SavedQueryDto> OnApply { get; set; }
 
+    /// <summary>
+    /// Gets or sets the callback raised for the delete event.
+    /// </summary>
     [Parameter] public EventCallback<SavedQueryDto> OnDelete { get; set; }
 }

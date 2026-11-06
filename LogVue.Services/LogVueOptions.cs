@@ -1,9 +1,18 @@
 namespace LogVue;
 
+/// <summary>
+/// Represents the log vue options.
+/// </summary>
 public sealed class LogVueOptions
 {
+    /// <summary>
+    /// The section name constant.
+    /// </summary>
     public const string SectionName = "LogVue";
 
+    /// <summary>
+    /// The default title constant.
+    /// </summary>
     public const string DefaultTitle = "LogVue";
 
     /// <summary>Browser tab title. The header logo and name come from the host's shell branding.</summary>
@@ -54,6 +63,9 @@ public sealed class LogVueOptions
     /// <summary>Entries older than this many days are deleted automatically. Zero keeps everything.</summary>
     public int RetentionDays { get; set; }
 
+    /// <summary>
+    /// Gets or sets the retention interval.
+    /// </summary>
     public TimeSpan RetentionInterval { get; set; } = TimeSpan.FromHours(1);
 
     /// <summary>

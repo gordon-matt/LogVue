@@ -9,6 +9,9 @@ using Microsoft.JSInterop;
 
 namespace LogVue.Components.Pages;
 
+/// <summary>
+/// Represents the dashboard.
+/// </summary>
 public partial class Dashboard : IAsyncDisposable
 {
     private static readonly LogVueLevel[] TileLevels =
@@ -110,6 +113,7 @@ public partial class Dashboard : IAsyncDisposable
         }
     }
 
+    /// <inheritdoc/>
     protected override void OnInitialized()
     {
         var parsed = DashboardFilter.FromUri(Navigation.Uri);
@@ -128,6 +132,7 @@ public partial class Dashboard : IAsyncDisposable
         Navigation.LocationChanged += OnLocationChanged;
     }
 
+    /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender || leaving)
@@ -339,12 +344,20 @@ public partial class Dashboard : IAsyncDisposable
     private static bool IncreaseIsBad(LogVueLevel level) =>
         level is LogVueLevel.Fatal or LogVueLevel.Error or LogVueLevel.Warning;
 
+    /// <summary>
+    /// Handles the shortcut event.
+    /// </summary>
+    /// <param name="key">The key.</param>
     [JSInvokable]
     public void OnShortcut(string key)
     {
         _ = key;
     }
 
+    /// <summary>
+    /// Releases the resources used by this instance.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async ValueTask DisposeAsync()
     {
         disposed = true;

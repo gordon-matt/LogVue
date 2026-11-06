@@ -295,6 +295,7 @@
         .Where(c => filter.Levels.Count == 0 || filter.Levels.Contains(c.Level))
         .Sum(c => c.Count);
 
+    /// <inheritdoc/>
     protected override void OnInitialized()
     {
         filter = DashboardFilter.FromUri(Navigation.Uri);
@@ -303,6 +304,7 @@
         Navigation.LocationChanged += OnLocationChanged;
     }
 
+    /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -792,9 +794,17 @@
         await JS.InvokeVoidAsync("logVue.setUtc", showUtc);
     }
 
+    /// <summary>
+    /// Handles the bottom visible event.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     [JSInvokable]
     public Task OnBottomVisible() => LoadMoreAsync();
 
+    /// <summary>
+    /// Handles the top visibility changed event.
+    /// </summary>
+    /// <param name="isVisible">The is visible.</param>
     [JSInvokable]
     public void OnTopVisibilityChanged(bool isVisible)
     {
@@ -810,6 +820,10 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Handles the shortcut event.
+    /// </summary>
+    /// <param name="key">The key.</param>
     [JSInvokable]
     public void OnShortcut(string key)
     {
@@ -838,6 +852,10 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Releases the resources used by this instance.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async ValueTask DisposeAsync()
     {
         disposed = true;

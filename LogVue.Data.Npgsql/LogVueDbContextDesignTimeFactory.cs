@@ -7,6 +7,11 @@ namespace LogVue.Data.Npgsql;
 /// </summary>
 public class LogVueDbContextDesignTimeFactory : IDesignTimeDbContextFactory<LogVueDbContext>
 {
+    /// <summary>
+    /// Creates the database context.
+    /// </summary>
+    /// <param name="args">The args.</param>
+    /// <returns>The database context.</returns>
     public LogVueDbContext CreateDbContext(string[] args) =>
         new(LogVueDbContextFactory.BuildOptions(
             "Host=localhost;Database=logvue_design;Username=postgres;Password=postgres"));

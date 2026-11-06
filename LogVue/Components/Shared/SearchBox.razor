@@ -42,12 +42,22 @@
     /// <summary>Why <see cref="Query"/> didn't parse, if it didn't. The dashboard shows it in full in place of the results.</summary>
     [Parameter] public string? Error { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this instance can save.
+    /// </summary>
     [Parameter] public bool CanSave { get; set; }
 
+    /// <summary>
+    /// Gets or sets the callback raised for the search event.
+    /// </summary>
     [Parameter] public EventCallback<string?> OnSearch { get; set; }
 
+    /// <summary>
+    /// Gets or sets the callback raised for the save event.
+    /// </summary>
     [Parameter] public EventCallback OnSave { get; set; }
 
+    /// <inheritdoc/>
     protected override void OnParametersSet()
     {
         // Only follow the applied query when it changes from outside (back button, a saved query,

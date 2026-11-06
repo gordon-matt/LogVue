@@ -15,15 +15,31 @@ public class LogEntry : BaseEntity<long>
     /// <summary>The message with its template rendered, as it would read in a text log.</summary>
     public string Message { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the message template.
+    /// </summary>
     public string MessageTemplate { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the exception.
+    /// </summary>
     public string? Exception { get; set; }
 
+    /// <summary>
+    /// Gets or sets the properties.
+    /// </summary>
     public ICollection<LogEntryProperty> Properties { get; set; } = [];
 }
 
+/// <summary>
+/// Represents the log entry map.
+/// </summary>
 public class LogEntryMap : IEntityTypeConfiguration<LogEntry>
 {
+    /// <summary>
+    /// Configures the value.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
     public void Configure(EntityTypeBuilder<LogEntry> builder)
     {
         builder.ToTable(Constants.Tables.Entries);

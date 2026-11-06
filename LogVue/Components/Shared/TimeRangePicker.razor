@@ -46,10 +46,19 @@
     private DateTime? customFrom;
     private DateTime? customTo;
 
+    /// <summary>
+    /// Gets or sets the filter.
+    /// </summary>
     [Parameter, EditorRequired] public DashboardFilter Filter { get; set; } = new();
 
+    /// <summary>
+    /// Gets or sets the time.
+    /// </summary>
     [Parameter, EditorRequired] public TimeDisplay Time { get; set; } = TimeDisplay.Utc;
 
+    /// <summary>
+    /// Gets or sets the callback raised for the change event.
+    /// </summary>
     [Parameter] public EventCallback<DashboardFilter> OnChange { get; set; }
 
     private string Label => Filter.Range != TimeRange.Custom

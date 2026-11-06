@@ -9,15 +9,29 @@ public sealed class LogLevelGate : ILogLevelGate
 {
     private int level;
 
+    /// <summary>
+    /// Initializes a new instance of the LogLevelGate class.
+    /// </summary>
+    /// <param name="options">The options.</param>
     public LogLevelGate(IOptions<LogVueOptions> options)
     {
         level = (int)options.Value.MinimumLevel;
     }
 
+    /// <summary>
+    /// Gets the current.
+    /// </summary>
     public LogVueLevel Current => (LogVueLevel)Volatile.Read(ref level);
 
+    /// <summary>
+    /// Occurs when changed.
+    /// </summary>
     public event Action<LogVueLevel>? Changed;
 
+    /// <summary>
+    /// Sets the value.
+    /// </summary>
+    /// <param name="level">The level.</param>
     public void Set(LogVueLevel level)
     {
         int updated = (int)level;

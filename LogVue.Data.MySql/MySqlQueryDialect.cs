@@ -6,5 +6,6 @@ namespace LogVue.Data.MySql;
 /// </summary>
 public sealed class MySqlQueryDialect : DefaultQueryDialect
 {
+    /// <inheritdoc/>
     protected override string EscapeCharacter => "!";
 }

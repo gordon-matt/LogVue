@@ -5,18 +5,37 @@ namespace LogVue.Services.Settings;
 /// </summary>
 public interface IMinimumLevelService
 {
+    /// <summary>
+    /// Gets the current.
+    /// </summary>
     LogVueLevel Current { get; }
 
+    /// <summary>
+    /// Sets the value.
+    /// </summary>
+    /// <param name="level">The level.</param>
+    /// <returns>The result.</returns>
     Result Set(LogVueLevel level);
 }
 
+/// <summary>
+/// Represents the minimum level service.
+/// </summary>
 public sealed class MinimumLevelService(
     ILogger<MinimumLevelService> logger,
     IOptions<LogVueOptions> options,
     ILogLevelGate levels) : IMinimumLevelService
 {
+    /// <summary>
+    /// Gets the current.
+    /// </summary>
     public LogVueLevel Current => levels.Current;
 
+    /// <summary>
+    /// Sets the value.
+    /// </summary>
+    /// <param name="level">The level.</param>
+    /// <returns>The result.</returns>
     public Result Set(LogVueLevel level)
     {
         if (options.Value.ReadOnly)

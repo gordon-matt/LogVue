@@ -10,6 +10,10 @@ public sealed class LogEventQueue : ILogEventWriter
     private readonly Channel<LogEventData> channel;
     private readonly IOptionsMonitor<LogVueOptions> options;
 
+    /// <summary>
+    /// Initializes a new instance of the LogEventQueue class.
+    /// </summary>
+    /// <param name="options">The options.</param>
     public LogEventQueue(IOptionsMonitor<LogVueOptions> options)
     {
         this.options = options;
@@ -24,6 +28,11 @@ public sealed class LogEventQueue : ILogEventWriter
 
     internal ChannelReader<LogEventData> Reader => channel.Reader;
 
+    /// <summary>
+    /// Attempts to write.
+    /// </summary>
+    /// <param name="logEvent">The log event.</param>
+    /// <returns>true when the condition is met; otherwise, false.</returns>
     public bool TryWrite(LogEventData logEvent)
     {
         if (IsDashboardTraffic(logEvent))

@@ -6,12 +6,22 @@ namespace LogVue.Data;
 /// </summary>
 public abstract class LogVueDbContextBase(DbContextOptions options) : DbContext(options)
 {
+    /// <summary>
+    /// Gets the log entries.
+    /// </summary>
     public DbSet<LogEntry> LogEntries => Set<LogEntry>();
 
+    /// <summary>
+    /// Gets the log entry properties.
+    /// </summary>
     public DbSet<LogEntryProperty> LogEntryProperties => Set<LogEntryProperty>();
 
+    /// <summary>
+    /// Gets the saved queries.
+    /// </summary>
     public DbSet<SavedQuery> SavedQueries => Set<SavedQuery>();
 
+    /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

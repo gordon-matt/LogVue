@@ -1,10 +1,25 @@
 namespace LogVue.Models;
 
+/// <summary>
+/// Specifies the message segment kind.
+/// </summary>
 public enum MessageSegmentKind
 {
+    /// <summary>
+    /// The text value.
+    /// </summary>
     Text,
+    /// <summary>
+    /// The string value.
+    /// </summary>
     String,
+    /// <summary>
+    /// The number value.
+    /// </summary>
     Number,
+    /// <summary>
+    /// The value value.
+    /// </summary>
     Value,
 }
 
@@ -14,6 +29,13 @@ public enum MessageSegmentKind
 /// </summary>
 public sealed record MessageSegment(string Text, MessageSegmentKind Kind, string? PropertyName = null)
 {
+    /// <summary>
+    /// Parses the value.
+    /// </summary>
+    /// <param name="template">The template.</param>
+    /// <param name="properties">The properties.</param>
+    /// <param name="fallbackMessage">The fallback message.</param>
+    /// <returns>The message segments.</returns>
     public static IReadOnlyList<MessageSegment> Parse(
         string template,
         IReadOnlyList<LogPropertyDto> properties,

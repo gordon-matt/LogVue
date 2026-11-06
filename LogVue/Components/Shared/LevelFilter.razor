@@ -27,11 +27,17 @@
 </label>
 
 @code {
+    /// <summary>
+    /// Gets or sets the filter.
+    /// </summary>
     [Parameter, EditorRequired] public DashboardFilter Filter { get; set; } = new();
 
     /// <summary>Null while loading.</summary>
     [Parameter] public IReadOnlyList<LevelCountDto>? Counts { get; set; }
 
+    /// <summary>
+    /// Gets or sets the callback raised for the change event.
+    /// </summary>
     [Parameter] public EventCallback<DashboardFilter> OnChange { get; set; }
 
     private string BarWidth(long count)

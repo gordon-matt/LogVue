@@ -17,13 +17,22 @@ public sealed record DashboardFilter
     private const string FromKey = "from";
     private const string ToKey = "to";
 
+    /// <summary>
+    /// Gets or sets the query.
+    /// </summary>
     public string? Query { get; init; }
 
     /// <summary>Empty means every level.</summary>
     public IReadOnlySet<LogVueLevel> Levels { get; init; } = new HashSet<LogVueLevel>();
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this instance is exceptions only.
+    /// </summary>
     public bool ExceptionsOnly { get; init; }
 
+    /// <summary>
+    /// Gets or sets the range.
+    /// </summary>
     public TimeRange Range { get; init; } = TimeRange.All;
 
     /// <summary>Only used with <see cref="TimeRange.Custom"/>.</summary>
@@ -32,9 +41,17 @@ public sealed record DashboardFilter
     /// <summary>Only used with <see cref="TimeRange.Custom"/>.</summary>
     public DateTime? ToUtc { get; init; }
 
+    /// <summary>
+    /// Gets a value indicating whether this instance has criteria.
+    /// </summary>
     public bool HasCriteria =>
         !string.IsNullOrWhiteSpace(Query) || Levels.Count > 0 || ExceptionsOnly || Range != TimeRange.All;
 
+    /// <summary>
+    /// Toggles the level.
+    /// </summary>
+    /// <param name="level">The level.</param>
+    /// <returns>The level.</returns>
     public DashboardFilter ToggleLevel(LogVueLevel level)
     {
         var levels = new HashSet<LogVueLevel>(Levels);
@@ -74,6 +91,11 @@ public sealed record DashboardFilter
             [ToKey] = Range == TimeRange.Custom ? FormatDate(ToUtc) : null,
         });
 
+    /// <summary>
+    /// Creates a value from the URI.
+    /// </summary>
+    /// <param name="uri">The URI.</param>
+    /// <returns>The URI.</returns>
     public static DashboardFilter FromUri(string uri)
     {
         var query = QueryHelpers.ParseQuery(new Uri(uri).Query);

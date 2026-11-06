@@ -9,6 +9,12 @@ public sealed partial class LogEntryService
     /// <summary>Past this many points a chart becomes a solid block, so the bucket widens instead.</summary>
     private const int MaxBuckets = 160;
 
+    /// <summary>
+    /// Gets the insights.
+    /// </summary>
+    /// <param name="filter">The filter.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the log insights.</returns>
     public Task<Result<LogInsightsDto>> GetInsightsAsync(
         LogFilter filter,
         CancellationToken cancellationToken = default) =>

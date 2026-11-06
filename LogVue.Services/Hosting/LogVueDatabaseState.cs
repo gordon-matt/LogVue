@@ -11,7 +11,13 @@ public sealed class LogVueDatabaseState
     /// <summary>Completes with <c>true</c> once the tables exist, or <c>false</c> if they never will.</summary>
     public Task<bool> Ready => ready.Task;
 
+    /// <summary>
+    /// Performs the mark ready operation.
+    /// </summary>
     public void MarkReady() => ready.TrySetResult(true);
 
+    /// <summary>
+    /// Performs the mark failed operation.
+    /// </summary>
     public void MarkFailed() => ready.TrySetResult(false);
 }

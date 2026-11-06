@@ -12,6 +12,10 @@ namespace LogVue.Providers.Serilog;
 /// </summary>
 public sealed class LogVueSerilogSink(ILogEventWriter writer) : ILogEventSink
 {
+    /// <summary>
+    /// Performs the emit operation.
+    /// </summary>
+    /// <param name="logEvent">The log event.</param>
     public void Emit(LogEvent logEvent) => writer.TryWrite(ToEvent(logEvent));
 
     internal static LogEventData ToEvent(LogEvent logEvent)

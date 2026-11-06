@@ -1,5 +1,8 @@
 namespace LogVue.Services.LogEntries;
 
+/// <summary>
+/// Represents the log entry service.
+/// </summary>
 public sealed partial class LogEntryService(
     ILogger<LogEntryService> logger,
     IOptions<LogVueOptions> options,
@@ -10,6 +13,12 @@ public sealed partial class LogEntryService(
 {
     private const int MaxPageSize = 1000;
 
+    /// <summary>
+    /// Searches the value.
+    /// </summary>
+    /// <param name="request">The request.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the log entry page.</returns>
     public Task<Result<LogEntryPageDto>> SearchAsync(
         LogEntrySearchRequest request,
         CancellationToken cancellationToken = default) =>
@@ -59,6 +68,12 @@ public sealed partial class LogEntryService(
             return Result<LogEntryPageDto>.Success(new LogEntryPageDto(items, hasMore));
         });
 
+    /// <summary>
+    /// Gets the level counts.
+    /// </summary>
+    /// <param name="filter">The filter.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the level counts.</returns>
     public Task<Result<IReadOnlyList<LevelCountDto>>> GetLevelCountsAsync(
         LogFilter filter,
         CancellationToken cancellationToken = default) =>
@@ -89,6 +104,11 @@ public sealed partial class LogEntryService(
             return Result<IReadOnlyList<LevelCountDto>>.Success(counts);
         });
 
+    /// <summary>
+    /// Gets the summary.
+    /// </summary>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the log store summary.</returns>
     public Task<Result<LogStoreSummaryDto>> GetSummaryAsync(CancellationToken cancellationToken = default) =>
         RunAsync("summarise the log store", async () =>
         {
@@ -112,6 +132,12 @@ public sealed partial class LogEntryService(
                 new LogStoreSummaryDto(total, oldest, newest, contextFactory.ProviderName));
         });
 
+    /// <summary>
+    /// Counts the matching.
+    /// </summary>
+    /// <param name="filter">The filter.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the long.</returns>
     public Task<Result<long>> CountMatchingAsync(LogFilter filter, CancellationToken cancellationToken = default) =>
         RunAsync("count matching entries", async () =>
         {
@@ -124,6 +150,12 @@ public sealed partial class LogEntryService(
                 : built.To<long>();
         });
 
+    /// <summary>
+    /// Deletes the value.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the result.</returns>
     public async Task<Result> DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
         if (options.Value.ReadOnly)
@@ -141,6 +173,12 @@ public sealed partial class LogEntryService(
             : Result.Success();
     }
 
+    /// <summary>
+    /// Deletes the matching.
+    /// </summary>
+    /// <param name="filter">The filter.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the int.</returns>
     public async Task<Result<int>> DeleteMatchingAsync(LogFilter filter, CancellationToken cancellationToken = default)
     {
         if (options.Value.ReadOnly)
@@ -165,6 +203,12 @@ public sealed partial class LogEntryService(
         });
     }
 
+    /// <summary>
+    /// Deletes the older than.
+    /// </summary>
+    /// <param name="cutoffUtc">The cutoff utc.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the int.</returns>
     public async Task<Result<int>> DeleteOlderThanAsync(DateTime cutoffUtc, CancellationToken cancellationToken = default)
     {
         if (options.Value.ReadOnly)

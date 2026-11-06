@@ -14,6 +14,9 @@ public sealed class LogEventData
     /// <summary>When the event occurred. Converted to UTC before it is stored.</summary>
     public required DateTimeOffset Timestamp { get; init; }
 
+    /// <summary>
+    /// Gets or sets the level.
+    /// </summary>
     public required LogVueLevel Level { get; init; }
 
     /// <summary>The message with its template rendered, as it would read in a text log.</summary>
@@ -25,5 +28,8 @@ public sealed class LogEventData
     /// <summary>The exception rendered with <see cref="Exception.ToString"/>, when there was one.</summary>
     public string? Exception { get; init; }
 
+    /// <summary>
+    /// Gets or sets the properties.
+    /// </summary>
     public IReadOnlyList<LogProperty> Properties { get; init; } = [];
 }

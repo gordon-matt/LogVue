@@ -11,6 +11,11 @@ public sealed class LogVueDatabaseInitializer(
     IOptions<LogVueOptions> options,
     LogVueDatabaseState databaseState) : IHostedService
 {
+    /// <summary>
+    /// Starts the value.
+    /// </summary>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         // Checked here rather than at registration so the provider call can come before or after
@@ -47,5 +52,10 @@ public sealed class LogVueDatabaseInitializer(
         }
     }
 
+    /// <summary>
+    /// Stops the value.
+    /// </summary>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

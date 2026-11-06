@@ -12,6 +12,9 @@ public record LogFilter
     /// <summary>Empty means every level.</summary>
     public IReadOnlyCollection<LogVueLevel> Levels { get; init; } = [];
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this instance is exceptions only.
+    /// </summary>
     public bool ExceptionsOnly { get; init; }
 
     /// <summary>Inclusive.</summary>
@@ -20,6 +23,9 @@ public record LogFilter
     /// <summary>Exclusive.</summary>
     public DateTime? ToUtc { get; init; }
 
+    /// <summary>
+    /// Gets a value indicating whether this instance is empty.
+    /// </summary>
     public bool IsEmpty =>
         string.IsNullOrWhiteSpace(Query)
         && Levels.Count == 0
@@ -34,6 +40,9 @@ public record LogFilter
 /// </summary>
 public record LogEntrySearchRequest
 {
+    /// <summary>
+    /// Gets or sets the filter.
+    /// </summary>
     public LogFilter Filter { get; init; } = new();
 
     /// <summary>Only entries older than this id: the next page down.</summary>
@@ -42,6 +51,9 @@ public record LogEntrySearchRequest
     /// <summary>Only entries newer than this id: what arrived since the last look.</summary>
     public long? AfterId { get; init; }
 
+    /// <summary>
+    /// Gets or sets the page size.
+    /// </summary>
     public int PageSize { get; init; } = 100;
 }
 
@@ -52,6 +64,17 @@ public record LogEntrySearchRequest
 /// </param>
 public record LogEntryPageDto(IReadOnlyList<LogEntryDto> Items, bool HasMore);
 
+/// <summary>
+/// Represents the log entry DTO.
+/// </summary>
+/// <param name="Id">The identifier.</param>
+/// <param name="Timestamp">The timestamp.</param>
+/// <param name="Level">The level.</param>
+/// <param name="Message">The message.</param>
+/// <param name="MessageTemplate">The message template.</param>
+/// <param name="Exception">The exception.</param>
+/// <param name="Properties">The properties.</param>
+/// <param name="Segments">The segments.</param>
 public record LogEntryDto(
     long Id,
     DateTime Timestamp,
@@ -62,13 +85,33 @@ public record LogEntryDto(
     IReadOnlyList<LogPropertyDto> Properties,
     IReadOnlyList<MessageSegment> Segments)
 {
+    /// <summary>
+    /// Gets the source context.
+    /// </summary>
     public string? SourceContext => Properties.FirstOrDefault(p => p.Name == "SourceContext")?.Value;
 }
 
+/// <summary>
+/// Represents the log property DTO.
+/// </summary>
+/// <param name="Name">The name.</param>
+/// <param name="Value">The value.</param>
 public record LogPropertyDto(string Name, string? Value);
 
+/// <summary>
+/// Represents the level count DTO.
+/// </summary>
+/// <param name="Level">The level.</param>
+/// <param name="Count">The count.</param>
 public record LevelCountDto(LogVueLevel Level, long Count);
 
+/// <summary>
+/// Represents the log store summary DTO.
+/// </summary>
+/// <param name="TotalCount">The total count.</param>
+/// <param name="OldestUtc">The oldest utc.</param>
+/// <param name="NewestUtc">The newest utc.</param>
+/// <param name="ProviderName">The provider name.</param>
 public record LogStoreSummaryDto(long TotalCount, DateTime? OldestUtc, DateTime? NewestUtc, string ProviderName);
 
 /// <summary>

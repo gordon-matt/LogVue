@@ -13,6 +13,7 @@ public sealed class LogVueRetentionService(
     LogVueDatabaseState databaseState,
     TimeProvider timeProvider) : BackgroundService
 {
+    /// <inheritdoc/>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var settings = options.Value;

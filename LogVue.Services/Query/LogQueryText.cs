@@ -32,6 +32,11 @@ public static class LogQueryText
             : $"{trimmed} and {condition}";
     }
 
+    /// <summary>
+    /// Gets the quote.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The quote.</returns>
     public static string Quote(string value) =>
         $"'{value.Replace("\\", "\\\\", StringComparison.Ordinal).Replace("'", "\\'", StringComparison.Ordinal)}'";
 }

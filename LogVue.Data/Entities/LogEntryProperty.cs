@@ -1,11 +1,23 @@
 namespace LogVue.Data.Entities;
 
+/// <summary>
+/// Represents the log entry property.
+/// </summary>
 public class LogEntryProperty : BaseEntity<long>
 {
+    /// <summary>
+    /// Gets or sets the log entry identifier.
+    /// </summary>
     public long LogEntryId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the log entry.
+    /// </summary>
     public LogEntry LogEntry { get; set; } = null!;
 
+    /// <summary>
+    /// Gets or sets the name.
+    /// </summary>
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
@@ -15,8 +27,15 @@ public class LogEntryProperty : BaseEntity<long>
     public string? Value { get; set; }
 }
 
+/// <summary>
+/// Represents the log entry property map.
+/// </summary>
 public class LogEntryPropertyMap : IEntityTypeConfiguration<LogEntryProperty>
 {
+    /// <summary>
+    /// Configures the value.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
     public void Configure(EntityTypeBuilder<LogEntryProperty> builder)
     {
         builder.ToTable(Constants.Tables.EntryProperties);

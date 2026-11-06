@@ -26,10 +26,25 @@ public class DefaultQueryDialect : ILogVueQueryDialect
     /// <summary>The character that makes the next one in a <c>LIKE</c> pattern literal.</summary>
     protected virtual string EscapeCharacter => "\\";
 
+    /// <summary>
+    /// Gets the equal to.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The equal to.</returns>
     public virtual Expression<Func<string?, bool>> EqualTo(string value) => s => s == value;
 
+    /// <summary>
+    /// Gets the like.
+    /// </summary>
+    /// <param name="pattern">The pattern.</param>
+    /// <returns>The like.</returns>
     public virtual Expression<Func<string?, bool>> Like(string pattern) => s => EF.Functions.Like(s, pattern);
 
+    /// <summary>
+    /// Determines whether the collection contains the specified value.
+    /// </summary>
+    /// <param name="term">The term.</param>
+    /// <returns>The string?, bool func expression.</returns>
     public virtual Expression<Func<string?, bool>> Contains(string term)
     {
         string pattern = $"%{EscapeLikePattern(term)}%";

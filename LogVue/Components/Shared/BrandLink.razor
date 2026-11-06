@@ -34,6 +34,9 @@
 
     private string Target => string.IsNullOrWhiteSpace(Href) ? ForgeBrand.Home(Shell.Value) : Href;
 
+    /// <summary>
+    /// Gets or sets the callback raised for the click event.
+    /// </summary>
     [Parameter]
     public EventCallback OnClick { get; set; }
 

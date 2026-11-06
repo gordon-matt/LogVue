@@ -15,10 +15,22 @@ public sealed class LogVueLoggerProvider(
 
     internal IExternalScopeProvider? ScopeProvider => scopeProvider;
 
+    /// <summary>
+    /// Sets the scope provider.
+    /// </summary>
+    /// <param name="scopeProvider">The scope provider.</param>
     public void SetScopeProvider(IExternalScopeProvider scopeProvider) => this.scopeProvider = scopeProvider;
 
+    /// <summary>
+    /// Creates the logger.
+    /// </summary>
+    /// <param name="categoryName">The category name.</param>
+    /// <returns>The logger.</returns>
     public ILogger CreateLogger(string categoryName) => new LogVueLogger(categoryName, this, writer, levels, options);
 
+    /// <summary>
+    /// Releases the resources used by this instance.
+    /// </summary>
     public void Dispose()
     {
     }

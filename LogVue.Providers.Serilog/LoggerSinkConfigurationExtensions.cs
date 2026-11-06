@@ -7,6 +7,9 @@ using Serilog.Core;
 // In Serilog's namespace, as sinks conventionally are, so `using Serilog;` is all a host needs.
 namespace Serilog;
 
+/// <summary>
+/// Provides extension methods for log vue logger sink configurations.
+/// </summary>
 public static class LogVueLoggerSinkConfigurationExtensions
 {
     extension(LoggerSinkConfiguration writeTo)

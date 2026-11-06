@@ -1,5 +1,8 @@
 namespace LogVue.Services;
 
+/// <summary>
+/// Provides log levels.
+/// </summary>
 public static class LogLevels
 {
     /// <summary>Most severe first, which is the order the dashboard lists them in.</summary>
@@ -41,6 +44,11 @@ public static class LogLevels
         return true;
     }
 
+    /// <summary>
+    /// Gets the short name.
+    /// </summary>
+    /// <param name="level">The level.</param>
+    /// <returns>The short name.</returns>
     public static string ShortName(LogVueLevel level) => level switch
     {
         LogVueLevel.Verbose => "VRB",

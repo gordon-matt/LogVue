@@ -8,10 +8,20 @@ namespace LogVue.Providers.Serilog;
 /// </summary>
 public sealed class SerilogLogLevelGate(LoggingLevelSwitch levelSwitch) : ILogLevelGate
 {
+    /// <summary>
+    /// Gets the current.
+    /// </summary>
     public LogVueLevel Current => LogVueSerilogLevel.FromSerilog(levelSwitch.MinimumLevel);
 
+    /// <summary>
+    /// Occurs when changed.
+    /// </summary>
     public event Action<LogVueLevel>? Changed;
 
+    /// <summary>
+    /// Sets the value.
+    /// </summary>
+    /// <param name="level">The level.</param>
     public void Set(LogVueLevel level)
     {
         var serilogLevel = LogVueSerilogLevel.ToSerilog(level);

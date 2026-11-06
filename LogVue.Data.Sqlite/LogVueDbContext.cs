@@ -1,9 +1,13 @@
 namespace LogVue.Data.Sqlite;
 
+/// <summary>
+/// Represents the log vue database context.
+/// </summary>
 public class LogVueDbContext(DbContextOptions<LogVueDbContext> options) : LogVueDbContextBase(options)
 {
     private const string CaseInsensitive = "NOCASE";
 
+    /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

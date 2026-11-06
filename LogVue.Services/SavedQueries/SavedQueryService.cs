@@ -1,10 +1,18 @@
 namespace LogVue.Services.SavedQueries;
 
+/// <summary>
+/// Represents the saved query service.
+/// </summary>
 public sealed class SavedQueryService(
     IOptions<LogVueOptions> options,
     ILogVueQueryDialect dialect,
     IRepository<SavedQuery> repository) : ISavedQueryService
 {
+    /// <summary>
+    /// Gets the all.
+    /// </summary>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the saved queries.</returns>
     public async Task<Result<IReadOnlyList<SavedQueryDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var queries = await repository.FindAsync(new SearchOptions<SavedQuery>
@@ -16,6 +24,12 @@ public sealed class SavedQueryService(
         return Result<IReadOnlyList<SavedQueryDto>>.Success([.. queries.Select(ToDto)]);
     }
 
+    /// <summary>
+    /// Saves the value.
+    /// </summary>
+    /// <param name="request">The request.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the saved query.</returns>
     public async Task<Result<SavedQueryDto>> SaveAsync(SaveQueryRequest request, CancellationToken cancellationToken = default)
     {
         if (options.Value.ReadOnly)
@@ -77,6 +91,12 @@ public sealed class SavedQueryService(
         return Result<SavedQueryDto>.Success(ToDto(saved));
     }
 
+    /// <summary>
+    /// Deletes the value.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the result.</returns>
     public async Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         if (options.Value.ReadOnly)

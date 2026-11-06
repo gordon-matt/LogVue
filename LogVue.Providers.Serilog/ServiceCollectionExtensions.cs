@@ -6,6 +6,9 @@ using Serilog.Core;
 
 namespace LogVue;
 
+/// <summary>
+/// Provides extension methods for serilog service collections.
+/// </summary>
 public static class SerilogServiceCollectionExtensions
 {
     extension(IServiceCollection services)
