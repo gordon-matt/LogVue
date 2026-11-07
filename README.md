@@ -238,10 +238,9 @@ dotnet ef migrations add <Name> --project LogVue.Data.Npgsql
 dotnet ef migrations add <Name> --project LogVue.Data.MySql
 ```
 
-## License and attribution
+## Credits
 
-LogVue is derived from [Sejil](https://github.com/alaatm/Sejil) by Alaa Masoud, licensed under
-the Apache License 2.0.
+LogVue is inspired by [Sejil](https://github.com/alaatm/Sejil) by Alaa Masoud
 
 ## Support
 
