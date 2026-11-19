@@ -21,18 +21,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<!--
-		  Served by LogVue's own endpoint rather than as static web assets, so the dashboard works
-		  whether or not the host calls UseStaticFiles or MapStaticAssets.
-		-->
-		<EmbeddedResource Include="Assets\*" LogicalName="LogVue.Assets.%(Filename)%(Extension)" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Include="build\LogVue.props" Pack="true" PackagePath="build;buildTransitive" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Heroicsoft.NetForge.Components" Version="1.2.3" />
+		<PackageReference Include="Heroicsoft.NetForge.Components" Version="1.2.6" />
+		<PackageReference Include="Heroicsoft.NetForge.WebAssets" Version="1.2.6" />
 	</ItemGroup>
 </Project>

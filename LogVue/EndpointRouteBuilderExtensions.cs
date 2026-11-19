@@ -1,3 +1,5 @@
+using Heroicsoft.NetForge.Components;
+using Heroicsoft.NetForge.WebAssets;
 using LogVue.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -21,9 +23,10 @@ public static class EndpointRouteBuilderExtensions
         {
             var options = endpoints.ServiceProvider.GetRequiredService<IOptions<LogVueOptions>>().Value;
 
-            var group = endpoints.MapGroup(options.BasePath);
+            endpoints.MapEmbeddedContent(typeof(EndpointRouteBuilderExtensions).Assembly);
+            endpoints.MapNetForgeAssets();
 
-            group.MapGet("_assets/{name}", EmbeddedAssets.Serve).ExcludeFromDescription();
+            var group = endpoints.MapGroup(options.BasePath);
 
             // The circuit script is requested relative to the dashboard's <base href>, which keeps
             // its hub connection under the base path too and away from any Blazor app the host
