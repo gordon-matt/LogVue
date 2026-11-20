@@ -285,4 +285,3 @@ build/
 *.db-shm
 *.db-wal
 TestResults/
-NuGet-Push.ps1
